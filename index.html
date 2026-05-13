@@ -2940,7 +2940,6 @@
 
     titleEl.textContent = title || path.split('/').pop();
     iconEl.textContent  = getDocIcon(type);
-    ext.href = href;
     dl.href  = href;
     dl.setAttribute('download', path.split('/').pop());
     loading.classList.remove('error');
@@ -2955,6 +2954,14 @@
     frame.onload = onLoad;
 
     const isFile = window.location.protocol === 'file:';
+
+    // "Nieuw tabblad" knop: voor Office-docs gebruiken we de Office Online viewer
+    // (anders triggert de browser een download bij directe navigatie naar .docx/.xlsx/.pptx)
+    if (OFFICE_TYPES.includes(type) && !isFile) {
+      ext.href = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(absUrl(path));
+    } else {
+      ext.href = href;
+    }
 
     if (type === 'pdf') {
       frame.src = href + '#view=FitH';
