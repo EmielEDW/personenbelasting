@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked@13.0.2/marked.min.js"></script>
 <style>
   :root {
     --cream: #F8F2E5;
@@ -955,6 +956,151 @@
     .docs-search { max-width: none; flex: 1 1 100%; order: 3; }
     .docs-drawer-body { padding: 16px 18px 60px; }
     .docs-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ===== DOCUMENT VIEWER MODAL ===== */
+  .doc-viewer-modal {
+    position: fixed; inset: 0;
+    background: rgba(31,27,22,0.82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 250;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 32px;
+  }
+  .doc-viewer-modal.show { display: flex; }
+  .doc-viewer-card {
+    width: 100%; height: 100%;
+    max-width: 1280px;
+    background: var(--cream);
+    border-radius: 12px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    animation: viewerIn .25s ease;
+  }
+  @keyframes viewerIn {
+    from { transform: scale(0.97); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .doc-viewer-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--cream-light);
+    display: flex; align-items: center; gap: 14px;
+    flex-shrink: 0;
+  }
+  .doc-viewer-icon {
+    font-size: 24px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .doc-viewer-title {
+    font-family: 'Fraunces', serif;
+    font-size: 17px; font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .doc-viewer-btn {
+    padding: 7px 14px;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .doc-viewer-btn:hover {
+    border-color: var(--wine);
+    color: var(--wine);
+  }
+  .doc-viewer-btn.primary {
+    background: var(--ink);
+    color: var(--cream);
+    border-color: var(--ink);
+  }
+  .doc-viewer-btn.primary:hover {
+    background: var(--wine);
+    border-color: var(--wine);
+    color: var(--cream);
+  }
+  .doc-viewer-close {
+    width: 34px; height: 34px;
+    border: 1px solid var(--line);
+    background: var(--cream);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .doc-viewer-close:hover {
+    border-color: var(--vermillion);
+    color: var(--vermillion);
+  }
+  .doc-viewer-body {
+    flex: 1;
+    position: relative;
+    background: #f5f1e7;
+    min-height: 0;
+  }
+  .doc-viewer-frame {
+    width: 100%; height: 100%;
+    border: 0;
+    background: var(--cream);
+    transition: opacity .25s;
+  }
+  .doc-viewer-loading {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: var(--ink-mute);
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-style: italic;
+    gap: 14px;
+    pointer-events: none;
+  }
+  .doc-viewer-loading::before {
+    content: '';
+    width: 28px; height: 28px;
+    border: 2px solid var(--cream-dark);
+    border-top-color: var(--wine);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .doc-viewer-loading.error::before { display: none; }
+  .doc-viewer-loading.error {
+    color: var(--vermillion);
+    pointer-events: auto;
+    padding: 32px;
+    text-align: center;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 720px) {
+    .doc-viewer-modal { padding: 0; }
+    .doc-viewer-card { border-radius: 0; }
+    .doc-viewer-header { padding: 10px 14px; gap: 8px; }
+    .doc-viewer-title { font-size: 14px; }
+    .doc-viewer-btn { padding: 6px 10px; font-size: 12px; }
+  }
+
+  /* doc cards are now buttons via onclick — keep cursor + remove visited color */
+  .doc-card, .chapter-docs-list a, .hero-doc-pill {
+    cursor: pointer;
   }
 
 </style>
@@ -2205,6 +2351,23 @@
   </div>
 </div>
 
+<!-- ===== DOCUMENT VIEWER MODAL ===== -->
+<div class="doc-viewer-modal" id="doc-viewer-modal">
+  <div class="doc-viewer-card">
+    <div class="doc-viewer-header">
+      <div class="doc-viewer-icon" id="doc-viewer-icon">📄</div>
+      <div class="doc-viewer-title" id="doc-viewer-title">Document</div>
+      <a class="doc-viewer-btn" id="doc-viewer-external" target="_blank" rel="noopener" title="Open in nieuw tabblad">↗ Nieuw tabblad</a>
+      <a class="doc-viewer-btn primary" id="doc-viewer-download" download title="Download bestand">⬇ Download</a>
+      <button class="doc-viewer-close" id="doc-viewer-close" title="Sluiten (Esc)">✕</button>
+    </div>
+    <div class="doc-viewer-body">
+      <div class="doc-viewer-loading" id="doc-viewer-loading">Document laden…</div>
+      <iframe class="doc-viewer-frame" id="doc-viewer-frame" frameborder="0" allow="fullscreen" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+
 <button class="fab" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Naar boven">↑</button>
 
 <script>
@@ -2229,6 +2392,7 @@
     enhanceChapters();
     injectHeroDocs();
     bindDocsEvents();
+    bindDocViewerEvents();
   }
 
   function buildTOC() {
@@ -2746,7 +2910,7 @@
         const fileName = d.path.split('/').pop();
         const href = encodePath(d.path);
         html += `
-          <a class="doc-card" href="${href}" target="_blank" rel="noopener" title="${escapeHtml(d.path)}">
+          <a class="doc-card" href="${href}" data-doc-path="${escapeHtml(d.path)}" data-doc-type="${d.type}" data-doc-title="${escapeHtml(d.title)}" title="${escapeHtml(d.path)}">
             <div class="doc-icon">${getDocIcon(d.type)}</div>
             <div class="doc-body">
               <div class="doc-title">${escapeHtml(d.title)}</div>
@@ -2762,6 +2926,140 @@
     }
     container.innerHTML = html;
   }
+
+  // ===== INLINE DOCUMENT VIEWER =====
+  function absUrl(relPath) {
+    if (/^https?:\/\//i.test(relPath)) return relPath;
+    const dir = window.location.pathname.replace(/\/[^\/]*$/, '/');
+    return window.location.origin + dir + encodePath(relPath);
+  }
+
+  const OFFICE_TYPES = ['docx', 'doc', 'pptx', 'ppt', 'xlsx', 'xls'];
+
+  function openDocInline(path, type, title) {
+    const modal   = document.getElementById('doc-viewer-modal');
+    const frame   = document.getElementById('doc-viewer-frame');
+    const titleEl = document.getElementById('doc-viewer-title');
+    const iconEl  = document.getElementById('doc-viewer-icon');
+    const ext     = document.getElementById('doc-viewer-external');
+    const dl      = document.getElementById('doc-viewer-download');
+    const loading = document.getElementById('doc-viewer-loading');
+    const href    = encodePath(path);
+
+    titleEl.textContent = title || path.split('/').pop();
+    iconEl.textContent  = getDocIcon(type);
+    ext.href = href;
+    dl.href  = href;
+    dl.setAttribute('download', path.split('/').pop());
+    loading.classList.remove('error');
+    loading.style.display = 'flex';
+    loading.textContent = 'Document laden…';
+    frame.style.opacity = '0';
+
+    const onLoad = () => {
+      loading.style.display = 'none';
+      frame.style.opacity = '1';
+    };
+    frame.onload = onLoad;
+
+    const isFile = window.location.protocol === 'file:';
+
+    if (type === 'pdf') {
+      frame.src = href + '#view=FitH';
+    } else if (OFFICE_TYPES.includes(type)) {
+      if (isFile) {
+        // Office Online viewer needs a publicly accessible URL
+        loading.classList.add('error');
+        loading.innerHTML = 'Office-documenten kunnen niet inline getoond worden bij lokaal openen (file://).<br>Open de site via Vercel/HTTP of klik op <strong>Nieuw tabblad</strong>.';
+        frame.src = 'about:blank';
+      } else {
+        const officeSrc = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(absUrl(path));
+        frame.src = officeSrc;
+      }
+    } else if (type === 'md') {
+      frame.src = 'about:blank';
+      fetch(href)
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+        .then(text => {
+          const body = (typeof marked !== 'undefined')
+            ? marked.parse(text)
+            : '<pre>' + escapeHtml(text) + '</pre>';
+          const doc = frame.contentDocument || frame.contentWindow.document;
+          doc.open();
+          doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Newsreader', Georgia, serif; padding: 56px 48px 80px; max-width: 760px; margin: 0 auto; line-height: 1.65; color: #1F1B16; background: #F8F2E5; }
+  h1, h2, h3, h4, h5 { font-family: 'Fraunces', serif; color: #1F1B16; line-height: 1.2; margin-top: 32px; margin-bottom: 12px; font-weight: 600; }
+  h1 { font-size: 2.2em; font-weight: 400; letter-spacing: -0.02em; }
+  h1 em { color: #6B2737; font-weight: 300; }
+  h2 { font-size: 1.55em; padding-bottom: 8px; border-bottom: 1px solid #D9CFB8; }
+  h3 { font-size: 1.25em; color: #6B2737; }
+  h4 { font-size: 1.05em; color: #6B2737; }
+  p { margin-bottom: 12px; color: #3A3530; }
+  a { color: #6B2737; }
+  em { color: #6B2737; }
+  strong { color: #1F1B16; font-weight: 600; }
+  blockquote { border-left: 3px solid #A87A1F; padding: 10px 18px; background: #FCF8EE; margin: 18px 0; color: #3A3530; border-radius: 0 6px 6px 0; }
+  blockquote p:last-child { margin-bottom: 0; }
+  code { background: #EDE3CD; padding: 2px 6px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
+  pre { background: #1F1B16; color: #F8F2E5; padding: 18px 22px; border-radius: 6px; overflow-x: auto; line-height: 1.55; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  pre code { background: none; padding: 0; color: inherit; }
+  table { border-collapse: collapse; margin: 18px 0; width: 100%; font-size: 0.95em; }
+  th, td { border: 1px solid #D9CFB8; padding: 9px 14px; text-align: left; }
+  th { background: #EDE3CD; font-family: 'Fraunces', serif; font-weight: 600; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { margin-bottom: 6px; color: #3A3530; }
+  li::marker { color: #A87A1F; }
+  hr { border: 0; border-top: 1px solid #D9CFB8; margin: 36px 0; }
+</style></head><body>${body}</body></html>`);
+          doc.close();
+          loading.style.display = 'none';
+          frame.style.opacity = '1';
+        })
+        .catch(err => {
+          loading.classList.add('error');
+          loading.textContent = 'Fout bij laden: ' + err.message;
+        });
+    } else {
+      // unknown — try direct iframe
+      frame.src = href;
+    }
+
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDocViewer() {
+    const modal = document.getElementById('doc-viewer-modal');
+    const frame = document.getElementById('doc-viewer-frame');
+    modal.classList.remove('show');
+    // clear iframe to stop video/audio etc.
+    setTimeout(() => { frame.src = 'about:blank'; }, 250);
+    document.body.style.overflow = '';
+  }
+
+  function bindDocViewerEvents() {
+    document.getElementById('doc-viewer-close')?.addEventListener('click', closeDocViewer);
+    document.getElementById('doc-viewer-modal')?.addEventListener('click', e => {
+      if (e.target.id === 'doc-viewer-modal') closeDocViewer();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('doc-viewer-modal')?.classList.contains('show')) closeDocViewer();
+    });
+    // delegated click handler for any element with data-doc-path
+    document.addEventListener('click', e => {
+      // ignore clicks on the viewer's own buttons (external/download have their own targets)
+      if (e.target.closest('.doc-viewer-header')) return;
+      const link = e.target.closest('[data-doc-path]');
+      if (!link) return;
+      // allow modifier-click and middle-click to open natively (new tab etc.)
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+      e.preventDefault();
+      openDocInline(link.dataset.docPath, link.dataset.docType, link.dataset.docTitle);
+    });
+  }
+  window.openDocInline = openDocInline;
 
   function openDocs() {
     const drawer = document.getElementById('docs-drawer');
@@ -2803,15 +3101,19 @@
   function injectHeroDocs() {
     const hero = document.querySelector('.hero');
     if (!hero || hero.querySelector('.hero-docs')) return;
+    const heroPills = [
+      { path: 'Notities lesopnames pb.docx', type: 'docx', label: '📘 Notities lesopnames (bron)' },
+      { path: '01_Cursus_van_leerkracht/Personenbelasting_(dag)_-_Documenten/aangifte-pb-aj-2025_deel_1_vl.pdf', type: 'pdf', label: '📕 Aangifte AJ 2025' },
+      { path: '01_Cursus_van_leerkracht/Personenbelasting_(dag)_-_Documenten/indextabel-lieven-van-belleghem-fiscale-bedragen-aj-2025-2026.pdf', type: 'pdf', label: '📕 Indextabel AJ 25-26' },
+      { path: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_DAG (1)/2025-2026-STUDIEWIJZER_Personenbelasting.docx', type: 'docx', label: '📘 Studiewijzer' },
+    ];
     const bar = document.createElement('div');
     bar.className = 'hero-docs';
-    bar.innerHTML = `
-      <a class="hero-doc-pill primary" href="#" onclick="event.preventDefault(); openDocs();">📁 Alle documenten</a>
-      <a class="hero-doc-pill" href="${encodePath('Notities lesopnames pb.docx')}" target="_blank" rel="noopener">📘 Notities lesopnames (bron)</a>
-      <a class="hero-doc-pill" href="${encodePath('01_Cursus_van_leerkracht/Personenbelasting_(dag)_-_Documenten/aangifte-pb-aj-2025_deel_1_vl.pdf')}" target="_blank" rel="noopener">📕 Aangifte AJ 2025</a>
-      <a class="hero-doc-pill" href="${encodePath('01_Cursus_van_leerkracht/Personenbelasting_(dag)_-_Documenten/indextabel-lieven-van-belleghem-fiscale-bedragen-aj-2025-2026.pdf')}" target="_blank" rel="noopener">📕 Indextabel AJ 25-26</a>
-      <a class="hero-doc-pill" href="${encodePath('01_Cursus_van_leerkracht/Leerpad_Personenbelasting_DAG (1)/2025-2026-STUDIEWIJZER_Personenbelasting.docx')}" target="_blank" rel="noopener">📘 Studiewijzer</a>
-    `;
+    let html = '<a class="hero-doc-pill primary" href="#" onclick="event.preventDefault(); openDocs();">📁 Alle documenten</a>';
+    for (const p of heroPills) {
+      html += `<a class="hero-doc-pill" href="${encodePath(p.path)}" data-doc-path="${escapeHtml(p.path)}" data-doc-type="${p.type}" data-doc-title="${escapeHtml(p.label.replace(/^\S+\s/, ''))}">${p.label}</a>`;
+    }
+    bar.innerHTML = html;
     hero.appendChild(bar);
   }
   window.openDocs = openDocs;
@@ -2845,7 +3147,7 @@
       let html = '<h4 class="chapter-docs-title">📂 Bijhorende documenten</h4><ul class="chapter-docs-list">';
       for (const d of matched) {
         const href = encodePath(d.path);
-        html += `<li><a href="${href}" target="_blank" rel="noopener">
+        html += `<li><a href="${href}" data-doc-path="${escapeHtml(d.path)}" data-doc-type="${d.type}" data-doc-title="${escapeHtml(d.title)}">
           <span class="doc-icon-inline">${getDocIcon(d.type)}</span>
           <span class="doc-link-title">${escapeHtml(d.title)}</span>
           <span class="doc-type-inline ${d.type}">${getDocLabel(d.type)}</span>
