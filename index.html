@@ -2879,11 +2879,6 @@
   // aan het juiste hoofdstuk te koppelen (lowercase substring match in chapter title).
   const DOCUMENTS = [
     // ---- Notities & samenvatting ----
-    { path: 'Notities lesopnames pb.docx',
-      title: 'Notities lesopnames PB (volledig)',
-      desc: 'Volledig notitieblok van de lesopnames — de oorspronkelijke bron voor deze samenvatting.',
-      type: 'docx', group: 'notities', tags: [] },
-
     // ---- Slides (cursus leerkracht) ----
     { path: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_DAG (1)/slides_Inleiding_PB_25-26_Gent.pptx',
       title: 'Slides — Inleiding PB (Gent, AJ 25-26)',
@@ -3333,7 +3328,6 @@
     const hero = document.querySelector('.hero');
     if (!hero || hero.querySelector('.hero-docs')) return;
     const heroPills = [
-      { path: 'Notities lesopnames pb.docx', type: 'docx', label: '📘 Notities lesopnames (bron)' },
       { path: '01_Cursus_van_leerkracht/Personenbelasting_(dag)_-_Documenten/aangifte-pb-aj-2025_deel_1_vl.pdf', type: 'pdf', label: '📕 Aangifte AJ 2025' },
       { path: '01_Cursus_van_leerkracht/Personenbelasting_(dag)_-_Documenten/indextabel-lieven-van-belleghem-fiscale-bedragen-aj-2025-2026.pdf', type: 'pdf', label: '📕 Indextabel AJ 25-26' },
       { path: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_DAG (1)/2025-2026-STUDIEWIJZER_Personenbelasting.docx', type: 'docx', label: '📘 Studiewijzer' },
