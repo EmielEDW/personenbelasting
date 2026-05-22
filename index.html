@@ -1341,6 +1341,67 @@
     cursor: default;
   }
 
+  /* ===== HERO DISCLAIMER ===== */
+  .hero-disclaimer {
+    margin-top: 28px;
+    background: var(--cream-light);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--brass);
+    border-radius: 0 8px 8px 0;
+    overflow: hidden;
+  }
+  .hero-disclaimer summary {
+    padding: 12px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    list-style: none;
+    transition: background .15s;
+  }
+  .hero-disclaimer summary::-webkit-details-marker { display: none; }
+  .hero-disclaimer summary::after {
+    content: ' ▾';
+    color: var(--ink-mute);
+    transition: transform .15s;
+    display: inline-block;
+  }
+  .hero-disclaimer[open] summary::after { transform: rotate(180deg); }
+  .hero-disclaimer summary:hover { background: var(--cream); }
+  .hero-disclaimer .disc-body {
+    padding: 6px 22px 18px;
+    border-top: 1px dashed var(--line);
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+  .hero-disclaimer .disc-body p {
+    margin-bottom: 10px;
+  }
+  .hero-disclaimer .disc-body p:last-child { margin-bottom: 0; }
+  .hero-disclaimer .disc-body strong { color: var(--ink); }
+  .hero-disclaimer .disc-body em { color: var(--wine); }
+  .hero-disclaimer .disc-body a { color: var(--wine); }
+
+  /* Calculator disclaimer banner */
+  .calc-disclaimer {
+    background: linear-gradient(135deg, #FFF5F2, #FCE9D8);
+    border: 1px solid var(--brass);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .calc-disclaimer .ico { font-size: 18px; line-height: 1.2; flex-shrink: 0; }
+  .calc-disclaimer strong { color: var(--wine); }
+
   /* ===== HERO PROMO ===== */
   .hero-pack-promo {
     margin-top: 36px;
@@ -2062,6 +2123,16 @@
         <div class="stat"><span class="stat-num" id="stat-done">0</span><span class="stat-label">Gestudeerd</span></div>
         <div class="stat"><span class="stat-num" id="stat-total">15</span><span class="stat-label">Hoofdstukken</span></div>
       </div>
+
+      <details class="hero-disclaimer">
+        <summary>⚠ Een eerlijke disclaimer — lees even (1 min)</summary>
+        <div class="disc-body">
+          <p>Deze samenvatting is gemaakt op basis van de <strong>lesopnames van de leerkracht</strong> en aangevuld met info uit het handboek <em>Praktisch Personenbelasting 2025</em> (S. Hugelier, Van In). De documenten zijn de hoofdbron — het boek is voornamelijk extra context.</p>
+          <p><strong>Normaal zou alles correct moeten zijn</strong>, maar ik heb het niet persoonlijk woord-voor-woord gecontroleerd. PB-fiscaliteit is complex en jaarlijks gewijzigd — als je een fout vermoedt: check altijd het officiële handboek, de aangifte of de indextabel.</p>
+          <p>De <strong>calculators</strong> zijn handige hulpmiddelen om je oefeningen te checken, maar PB-formules hebben veel uitzonderingen en grensgevallen. Voor het examen blijft de <em>methodologie</em> belangrijker dan een snelle tool. Gebruik ze om je antwoorden te verifiëren, niet als ultiem bewijs.</p>
+          <p style="color: var(--ink-mute); font-style: italic;">Vragen, fouten gespot of suggesties? Mail naar <a href="mailto:info@emieldewaele.com">info@emieldewaele.com</a> — ik fix het meteen. Succes met studeren.</p>
+        </div>
+      </details>
 
       <div class="hero-pack-promo">
         <div class="promo-text">
@@ -4709,7 +4780,10 @@
       </div>`;
       return;
     }
-    body.innerHTML = calc.render();
+    body.innerHTML = `<div class="calc-disclaimer">
+      <span class="ico">⚠</span>
+      <div><strong>Disclaimer:</strong> deze calculators implementeren de standaard PB-formules zoals beschreven in <em>Praktisch Personenbelasting 2025</em> en de officiële indextabel. PB-fiscaliteit kent veel uitzonderingen en grensgevallen — <strong>controleer altijd je antwoord</strong> met de oplossingsdocumenten en de cursus. Bedragen volgen AJ 2025 tenzij anders aangegeven.</div>
+    </div>` + calc.render();
     calc.bind();
   }
 
