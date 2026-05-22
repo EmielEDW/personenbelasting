@@ -205,7 +205,17 @@ module.exports = async (req, res) => {
              <p>Fout: <pre>${JSON.stringify(emailResult.error)}</pre></p>`,
       text: `Email failed for ${customerEmail}. Code to send manually: ${code}. Session ${session.id}.`,
     });
-    return res.status(200).json({ ok: false, error: 'email-failed' });
+    // Echo the Resend error in the response so we can diagnose from Stripe
+    // event delivery view (without needing access to Vercel logs).
+    return res.status(200).json({
+      ok: false,
+      error: 'email-failed',
+      detail: typeof emailResult.error === 'string'
+        ? emailResult.error
+        : (emailResult.error && (emailResult.error.message || emailResult.error.name)) || JSON.stringify(emailResult.error).slice(0, 300),
+      from: FROM_EMAIL,
+      to: customerEmail,
+    });
   }
 
   await kvCmd(['SET', dedupKey, JSON.stringify({ code, email: customerEmail, ts: Date.now() }), 'EX', '7776000']);
