@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked@13.0.2/marked.min.js"></script>
+<script src="auth.js"></script>
 <style>
   :root {
     --cream: #F8F2E5;
@@ -1103,6 +1104,378 @@
     cursor: pointer;
   }
 
+  /* ===== PAYWALL — CHAPTER OVERLAY ===== */
+  .chapter-paywall {
+    margin: 0 0 32px;
+    padding: 32px 28px;
+    background: linear-gradient(140deg, #FFF9F0 0%, #FCE9D8 100%);
+    border: 1px solid var(--brass);
+    border-left: 4px solid var(--wine);
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .chapter-paywall .pw-icon {
+    font-size: 36px; margin-bottom: 6px;
+  }
+  .chapter-paywall h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--wine);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .chapter-paywall p {
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    max-width: 540px;
+    margin: 0 auto 18px;
+    line-height: 1.55;
+  }
+  .chapter-paywall .pw-cta {
+    display: inline-block;
+    padding: 12px 26px;
+    background: var(--wine);
+    color: var(--cream);
+    border: none;
+    border-radius: 999px;
+    font-family: inherit; font-size: 15px; font-weight: 500;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: background .2s, transform .1s;
+  }
+  .chapter-paywall .pw-cta:hover { background: var(--wine-soft); }
+  .chapter-paywall .pw-cta:active { transform: scale(0.98); }
+  .chapter-paywall .pw-note {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--ink-mute);
+    font-style: italic;
+  }
+  .chapter-paywall .pw-secondary {
+    margin-top: 6px;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-family: inherit; font-size: 13.5px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .chapter-paywall .pw-secondary:hover { border-color: var(--ink-soft); color: var(--ink); }
+
+  /* ===== LOCKED DOCUMENT STYLING ===== */
+  .doc-card.doc--locked,
+  .chapter-docs-list a.doc--locked,
+  .hero-doc-pill.doc--locked {
+    position: relative;
+    opacity: 0.78;
+  }
+  .doc-card.doc--locked::after,
+  .chapter-docs-list a.doc--locked::after {
+    content: '🔒 Pack';
+    position: absolute;
+    top: 8px; right: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    background: var(--wine);
+    color: var(--cream);
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .chapter-docs-list a.doc--locked::after {
+    position: static;
+    margin-left: auto;
+  }
+  .hero-doc-pill.doc--locked::before { content: '🔒 '; }
+
+  /* ===== HEADER PACK BADGE ===== */
+  .pack-badge {
+    display: inline-flex;
+    align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--cream-light);
+    color: var(--ink-soft);
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .pack-badge.locked {
+    background: var(--wine);
+    color: var(--cream);
+    border-color: var(--wine);
+  }
+  .pack-badge.locked:hover {
+    background: var(--wine-soft);
+    border-color: var(--wine-soft);
+  }
+  .pack-badge.unlocked {
+    background: linear-gradient(135deg, var(--sage), #6F8A6B);
+    color: white;
+    border-color: var(--sage);
+    cursor: default;
+  }
+
+  /* ===== HERO PROMO ===== */
+  .hero-pack-promo {
+    margin-top: 36px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, var(--ink) 0%, var(--wine) 100%);
+    color: var(--cream);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: var(--shadow-lg);
+  }
+  .hero-pack-promo .promo-text { flex: 1; min-width: 0; }
+  .hero-pack-promo .promo-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    background: rgba(252, 248, 238, 0.15);
+    color: var(--brass-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .hero-pack-promo h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px; font-weight: 500;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .hero-pack-promo h3 em { color: var(--brass-soft); font-style: italic; }
+  .hero-pack-promo p {
+    font-size: 14.5px;
+    color: rgba(252, 248, 238, 0.85);
+    line-height: 1.5;
+  }
+  .hero-pack-promo .promo-cta {
+    flex-shrink: 0;
+    display: inline-flex; flex-direction: column;
+    gap: 6px; align-items: stretch;
+  }
+  .hero-pack-promo .promo-buy {
+    background: var(--cream);
+    color: var(--wine);
+    padding: 12px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    font-family: inherit; font-size: 15px;
+    cursor: pointer;
+    transition: transform .15s, background .2s;
+  }
+  .hero-pack-promo .promo-buy:hover { background: white; transform: translateY(-1px); }
+  .hero-pack-promo .promo-have-code {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(252,248,238,0.3);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-family: inherit; font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .2s;
+  }
+  .hero-pack-promo .promo-have-code:hover { border-color: var(--cream); }
+  body.pb-unlocked .hero-pack-promo { display: none; }
+
+  @media (max-width: 720px) {
+    .hero-pack-promo { flex-direction: column; align-items: stretch; }
+  }
+
+  /* ===== UNLOCK MODAL (rendered by auth.js) ===== */
+  .pb-unlock-modal {
+    position: fixed; inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .pb-unlock-modal[hidden] { display: none; }
+  .pb-unlock-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(31,27,22,0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .pb-unlock-content {
+    position: relative;
+    width: 100%; max-width: 540px;
+    background: var(--cream);
+    border-radius: 14px;
+    padding: 32px 32px 28px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    animation: pb-pop .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes pb-pop {
+    from { transform: scale(0.94); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .pb-unlock-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    border: 1px solid var(--line);
+    background: var(--cream-light);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--ink-soft);
+    transition: all .15s;
+  }
+  .pb-unlock-close:hover { border-color: var(--vermillion); color: var(--vermillion); }
+  .pb-unlock-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--wine);
+    color: var(--cream);
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.15em;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .pb-unlock-content h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 26px; font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+  }
+  .pb-unlock-lead {
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+  .pb-unlock-features {
+    list-style: none;
+    margin: 0 0 22px;
+    padding: 0;
+  }
+  .pb-unlock-features li {
+    padding: 8px 0;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--line);
+    line-height: 1.45;
+  }
+  .pb-unlock-features li::before {
+    content: '✓ ';
+    color: var(--sage);
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .pb-unlock-features li:last-child { border-bottom: 0; }
+  .pb-unlock-actions { display: flex; flex-direction: column; gap: 14px; }
+  .pb-unlock-buy {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 16px 24px;
+    background: var(--wine);
+    color: var(--cream);
+    border: none;
+    border-radius: 12px;
+    text-decoration: none;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+  }
+  .pb-unlock-buy:hover { background: var(--wine-soft); }
+  .pb-unlock-buy:active { transform: scale(0.99); }
+  .pb-unlock-buy .pb-price {
+    font-family: 'Fraunces', serif;
+    font-size: 24px; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .pb-unlock-buy .pb-buy-label {
+    font-size: 15px; font-weight: 500;
+  }
+  .pb-unlock-divider {
+    text-align: center;
+    position: relative;
+    color: var(--ink-mute);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .pb-unlock-divider::before, .pb-unlock-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%; width: calc(50% - 24px); height: 1px;
+    background: var(--line);
+  }
+  .pb-unlock-divider::before { left: 0; }
+  .pb-unlock-divider::after { right: 0; }
+  .pb-unlock-form label {
+    display: block; margin-bottom: 6px;
+    font-size: 13px; color: var(--ink-mute);
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .pb-unlock-input-row { display: flex; gap: 8px; }
+  .pb-unlock-input-row input {
+    flex: 1;
+    padding: 11px 16px;
+    border: 1px solid var(--line);
+    background: var(--cream-light);
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    outline: none;
+  }
+  .pb-unlock-input-row input:focus {
+    border-color: var(--brass);
+    box-shadow: 0 0 0 3px rgba(168,122,31,0.15);
+  }
+  .pb-unlock-input-row button {
+    padding: 11px 20px;
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    border-radius: 8px;
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .pb-unlock-input-row button:hover { background: var(--wine); }
+  .pb-unlock-feedback {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-mute);
+    min-height: 18px;
+  }
+  .pb-unlock-feedback.ok { color: var(--sage); }
+  .pb-unlock-feedback.err { color: var(--vermillion); }
+  .pb-unlock-footer {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--ink-mute);
+    line-height: 1.5;
+    text-align: center;
+  }
+  .pb-unlock-footer a { color: var(--wine); }
+
 </style>
 </head>
 <body>
@@ -1114,6 +1487,7 @@
       <input type="text" id="search" placeholder="Zoek in alle hoofdstukken…">
     </div>
     <div class="top-actions">
+      <span data-pack-status></span>
       <button class="btn" id="filter-examen" title="Toon alleen examen-onderwerpen">Examen-modus</button>
       <button class="btn" id="open-docs" title="Open documentenbibliotheek">📁 Documenten</button>
       <button class="btn" id="open-flashcards" title="Open flashcards">🃏 Flashcards</button>
@@ -1146,6 +1520,18 @@
         <div class="stat"><span class="stat-num" id="stat-examen">—</span><span class="stat-label">Examen-items</span></div>
         <div class="stat"><span class="stat-num" id="stat-done">0</span><span class="stat-label">Gestudeerd</span></div>
         <div class="stat"><span class="stat-num" id="stat-total">15</span><span class="stat-label">Hoofdstukken</span></div>
+      </div>
+
+      <div class="hero-pack-promo">
+        <div class="promo-text">
+          <span class="promo-tag">💎 EXAMEN-PACK</span>
+          <h3>De volledige samenvatting — <em>alle 15 hoofdstukken</em></h3>
+          <p>Gratis: hoofdstuk 1 t/m 5 + documenten van de eerste 3 hoofdstukken.<br>Pack: alle hoofdstukken + alle cursusdocumenten + uitgebreide flashcards. Eenmalig €9,99.</p>
+        </div>
+        <div class="promo-cta">
+          <button class="promo-buy" data-open-unlock type="button">€9,99 · Koop pack</button>
+          <button class="promo-have-code" data-open-unlock type="button">Ik heb een code</button>
+        </div>
       </div>
     </section>
 
@@ -2620,12 +3006,122 @@
     countExamen();
     updateProgress();
     loadStored();
+    applyPaywall();          // before flashcards init so locked cards are filtered out
     initFlashcards();
     enhanceChapters();
     injectHeroDocs();
     bindDocsEvents();
     bindDocViewerEvents();
+    bindPaywallEvents();
+    applyPaywall();          // run again to tag doc-link elements created by the steps above
   }
+
+  // ===== PAYWALL ===========================================================
+  // Free chapters: 1-5. Pro chapters: 6-15.
+  // Free documents: tied to chapter 1-3 (or no specific chapter). Pro: tied to ch 4+.
+  const FREE_CHAPTER_MAX = 5;
+  const FREE_DOC_CHAPTER_MAX = 3;
+
+  function isPackUnlocked() {
+    return !!(window.PBAuth && window.PBAuth.isUnlocked());
+  }
+
+  function docChapter(d) {
+    const tags = (d.tags || []).map(t => t.toLowerCase());
+    const has = (...names) => tags.some(t => names.some(n => t.includes(n)));
+    if (has('huwelijksquot', 'fiscaal gezin', 'gezinslast', 'gehuwde', 'samenwonende', 'vak ii')) return 4;
+    if (has('belastingberekening', 'tarieven', 'schijven', 'belastingvrije som', 'belastbaar minimum')) return 3;
+    if (has('vak iv', 'bezoldiging', 'loon', 'beroepsinkomen', 'fiche', '281.10')) return 5;
+    if (has('vak iii', 'onroerend', 'kadastraal', 'leegstand')) return 8;
+    if (has('vak vii', 'roerend', 'intrest', 'dividend')) return 8;
+    if (has('vak viii', 'aftrekbare bestedingen', 'onderhoudsgeld')) return 11;
+    if (has('vak ix', 'woning', 'lening', 'hypothecair', 'woningfiscaliteit')) return 15;
+    if (has('vak x', 'belastingvermindering', 'kinderopvang', 'taxcalc')) return 12;
+    if (has('vak xv', 'meerwaarde', 'gronden')) return 14;
+    if (has('vak xvi', 'diverse inkomsten', 'airbnb')) return 13;
+    if (has('vak xvii', 'beroepskosten', 'aftrekbare kosten', 'afschrijving', 'investeringsaftrek', 'zelfstandige')) return 9;
+    if (has('globale oefening')) return 15;
+    if (has('aangifte', 'formulier', 'aanslagbiljet', 'indextabel', 'tax-on-web', 'voorstel vereenvoudigde', 'inleiding', 'hoofdstuk 1', 'rijksinwoner', 'aanslagjaar', 'belastingplichtige')) return 1;
+    return null;
+  }
+
+  function isDocPro(d) {
+    const ch = docChapter(d);
+    return ch !== null && ch > FREE_DOC_CHAPTER_MAX;
+  }
+
+  function flashcardChapterNum(card) {
+    // cat format: "07 · Bedrijfsleider" → 7
+    const m = String(card.cat || '').match(/^(\d+)/);
+    return m ? parseInt(m[1], 10) : null;
+  }
+
+  function applyPaywall() {
+    const unlocked = isPackUnlocked();
+    document.body.classList.toggle('pb-unlocked', unlocked);
+
+    // 1) Lock chapters > FREE_CHAPTER_MAX
+    document.querySelectorAll('.chapter').forEach(ch => {
+      const num = parseInt(ch.dataset.num, 10);
+      const isPro = num > FREE_CHAPTER_MAX;
+      ch.classList.toggle('chapter--pro', isPro);
+      const content = ch.querySelector('.chapter-content');
+      if (!content) return;
+      let paywall = ch.querySelector('.chapter-paywall');
+      if (isPro && !unlocked) {
+        if (!paywall) {
+          paywall = document.createElement('div');
+          paywall.className = 'chapter-paywall';
+          paywall.innerHTML = `
+            <div class="pw-icon">💎</div>
+            <h3>Dit hoofdstuk zit in het Examen-pack</h3>
+            <p>Hoofdstuk 6 t/m 15 zijn enkel zichtbaar met het Examen-pack — €9,99 éénmalig. De eerste 5 hoofdstukken blijven gratis.</p>
+            <button class="pw-cta" data-open-unlock type="button">💎 Ontgrendel — €9,99</button>
+            <div><button class="pw-secondary" data-open-unlock type="button">Ik heb al een code</button></div>
+            <p class="pw-note">Na betaling krijg je automatisch een toegangscode per mail.</p>
+          `;
+          content.parentNode.insertBefore(paywall, content);
+        }
+        content.hidden = true;
+        paywall.hidden = false;
+      } else {
+        if (paywall) paywall.hidden = true;
+        content.hidden = false;
+      }
+    });
+
+    // 2) Mark / unmark locked documents
+    const proSet = new Set(DOCUMENTS.filter(d => isDocPro(d)).map(d => d.path));
+    document.querySelectorAll('[data-doc-path]').forEach(el => {
+      const path = el.dataset.docPath;
+      const locked = !unlocked && proSet.has(path);
+      el.classList.toggle('doc--locked', locked);
+      el.dataset.docLocked = locked ? '1' : '0';
+    });
+
+    // 3) Filter flashcards by chapter number — mutate in place so renderCard() sees the new deck
+    if (Array.isArray(window.__allFlashcards) && Array.isArray(flashcards)) {
+      flashcards.length = 0;
+      window.__allFlashcards.forEach(c => {
+        const cnum = flashcardChapterNum(c);
+        if (unlocked || cnum === null || cnum <= FREE_CHAPTER_MAX) flashcards.push(c);
+      });
+      state.cardIndex = 0;
+      if (typeof renderCard === 'function' && flashcards.length) renderCard();
+    }
+
+    // 4) Update progress bar denominator (free chapters only when locked)
+    const total = unlocked ? 15 : FREE_CHAPTER_MAX;
+    const totalEl = document.getElementById('stat-total');
+    if (totalEl) totalEl.textContent = total;
+  }
+
+  function bindPaywallEvents() {
+    if (window.PBAuth && typeof window.PBAuth.onChange === 'function') {
+      window.PBAuth.onChange(() => applyPaywall());
+    }
+  }
+
 
   function buildTOC() {
     const toc = document.getElementById('toc');
@@ -2840,8 +3336,12 @@
 
   // ===== FLASHCARDS =====
   function initFlashcards() {
+    // Snapshot full deck so applyPaywall() can filter without losing data
+    if (!window.__allFlashcards) window.__allFlashcards = flashcards.slice();
+    applyPaywall(); // ensure flashcards filtered to current lock state
     renderCard();
   }
+  window.flashcards = flashcards; // expose for paywall filter
   function openFlashcards() {
     document.getElementById('flashcards-modal').classList.add('show');
   }
@@ -3279,6 +3779,14 @@
       if (e.target.closest('.doc-viewer-header')) return;
       const link = e.target.closest('[data-doc-path]');
       if (!link) return;
+      // If document is locked behind the paywall, open the unlock modal instead
+      if (link.dataset.docLocked === '1') {
+        e.preventDefault();
+        if (window.PBAuth && typeof window.PBAuth.openUnlockModal === 'function') {
+          window.PBAuth.openUnlockModal();
+        }
+        return;
+      }
       // allow modifier-click and middle-click to open natively (new tab etc.)
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
       e.preventDefault();
@@ -3290,7 +3798,10 @@
   function openDocs() {
     const drawer = document.getElementById('docs-drawer');
     if (!drawer) return;
-    if (!document.getElementById('docs-content').innerHTML.trim()) renderDocs();
+    if (!document.getElementById('docs-content').innerHTML.trim()) {
+      renderDocs();
+      applyPaywall(); // tag newly created doc cards
+    }
     drawer.classList.add('show');
     document.body.style.overflow = 'hidden';
     setTimeout(() => document.getElementById('docs-search')?.focus(), 100);
@@ -3420,7 +3931,93 @@
     { cat: '14 · Meerwaarde', q: 'Wanneer spreek je van een "grond" voor meerwaardebelasting?', a: 'Wanneer het gebouw dat erop staat minder dan 30% uitmaakt van de totale waarde. De registratiewaarde is basis voor berekening indien hoger dan aankoopprijs. Datum compromis telt!' },
     { cat: '15 · Woning', q: 'Welke 3 zaken kun je aangeven bij een hypothecaire lening?', a: 'Kapitaalaflossingen, intresten en de premie van de schuldsaldoverzekering (SSV). Verminderingen op basis van attesten.' },
     { cat: '15 · Woning', q: 'Wat is de stand van zaken anno 2026 voor woningfiscaliteit?', a: 'Alle nieuwe regelingen vanaf 2025 geven GEEN fiscaal voordeel meer. Voordeel hangt af van wanneer de lening werd aangegaan (welke generatie).' },
-    { cat: '15 · Woning', q: 'Hoe bereken je het effectieve fiscaal voordeel van de woningfiscaliteit?', a: 'Bedrag in de korf × marginaal tarief. Bv. €2.280 × 50% = €1.140. Optimalisatie: plaats grootste bedrag bij partner met hoogste marginaal tarief.' }
+    { cat: '15 · Woning', q: 'Hoe bereken je het effectieve fiscaal voordeel van de woningfiscaliteit?', a: 'Bedrag in de korf × marginaal tarief. Bv. €2.280 × 50% = €1.140. Optimalisatie: plaats grootste bedrag bij partner met hoogste marginaal tarief.' },
+
+    // ===== UITGEBREIDE SET =====
+    // 01 · Inleiding
+    { cat: '01 · Inleiding', q: 'Wat is het verschil tussen inkomstenjaar en aanslagjaar?', a: 'Het inkomstenjaar (IJ) is het kalenderjaar waarin de inkomsten worden verworven. Het aanslagjaar (AJ) is het jaar erná, waarin je aangifte indient en het aanslagbiljet ontvangt. IJ 2024 = AJ 2025.' },
+    { cat: '01 · Inleiding', q: 'Welke 2 delen heeft de aangifte personenbelasting?', a: 'Deel 1 = vakken I t/m XIV (algemene inkomsten, beroepsinkomsten, woningfiscaliteit…). Deel 2 = vakken XV t/m XXIII (diverse inkomsten, bezoldigingen bedrijfsleiders, winsten, baten).' },
+    { cat: '01 · Inleiding', q: 'Wat is een "rijksinwoner" volgens het WIB?', a: 'Een natuurlijke persoon met fiscale woonplaats of zetel van fortuin in België. Op die rijksinwoner is de personenbelasting van toepassing op zijn/haar WERELDWIJD inkomen.' },
+    { cat: '01 · Inleiding', q: 'Geef 2 voorbeelden van indirecte belastingen.', a: 'BTW (verbruiksbelasting), accijnzen (alcohol/tabak/brandstof), registratierechten (akte/aankoop), successierechten (overlijden), douanerechten (invoer).' },
+    { cat: '01 · Inleiding', q: 'Wat is een vereenvoudigd voorstel van aangifte?', a: 'Een door de fiscus voorinvulde aangifte voor mensen met eenvoudige situaties. Je controleert en mag corrigeren binnen de termijn — anders geldt het voorstel als ingediende aangifte.' },
+
+    // 02 · GBI
+    { cat: '02 · GBI', q: 'Uit welke 4 categorieën bestaat het GBI?', a: 'Onroerende inkomsten (OI), roerende inkomsten (RI), beroepsinkomsten (BI) en diverse inkomsten (DI).' },
+    { cat: '02 · GBI', q: 'Wat is "gezamenlijk belastbaar" vs. "afzonderlijk belastbaar"?', a: 'Gezamenlijk = samengevoegd en belast aan progressieve tarieven (25/40/45/50%). Afzonderlijk = belast aan een vast tarief (bv. 30% voor RI/DI of 16,5% voor sommige meerwaarden).' },
+    { cat: '02 · GBI', q: 'Welke progressieve schijven zijn er in AJ 2025?', a: '25% op €0-15.820 · 40% op €15.820-27.920 · 45% op €27.920-48.320 · 50% boven €48.320 (indexatie per AJ raadplegen).' },
+    { cat: '02 · GBI', q: 'Wat is het verschil tussen "decumul" en "cumul"?', a: 'Decumul = elk echtgenoot wordt apart belast op zijn/haar eigen inkomsten. Cumul = oude regeling waar inkomsten samen werden geteld. In België geldt sinds 2004 decumul.' },
+
+    // 03 · BVS
+    { cat: '03 · BVS', q: 'Wat is BVS en wat is het effect ervan?', a: 'Belastingvrije Som — een eerste schijf van het belastbaar inkomen dat NIET belast wordt (effectief: belast aan 0%). Het bedrag waarvoor geen belasting verschuldigd is.' },
+    { cat: '03 · BVS', q: 'Hoeveel bedraagt de verhoging BVS voor 1 kind ten laste (AJ 2025)?', a: '€1.920. De verhoging is progressief: 2 kinderen = €4.940, 3 kinderen = €11.090, 4 kinderen = €17.940, +€6.850 per extra kind.' },
+    { cat: '03 · BVS', q: 'Wat is een belastingkrediet en wanneer is het terugbetaalbaar?', a: 'Belastingkrediet = vermindering die zelfs uitgekeerd kan worden als je geen belasting verschuldigd bent. Voor kinderen ten laste: €550/kind terugbetaalbaar gedeelte (AJ 2025).' },
+    { cat: '03 · BVS', q: 'Wat is een "om te slane belasting"?', a: 'De belasting die berekend wordt op het deel van de BVS dat door de fiscus wordt "omgeslagen" tussen partners — typische berekening bij gehuwden waarbij één veel meer verdient dan de andere.' },
+
+    // 04 · Gezin
+    { cat: '04 · Gezin', q: 'Welke aangifte (afzonderlijk of gezamenlijk) in het jaar van huwelijk?', a: 'Afzonderlijk. Pas vanaf het jaar erná dien je een gezamenlijke aangifte in. (Tenzij jullie al wettelijk samenwoonden voordien — dan verandert het huwelijk niks.)' },
+    { cat: '04 · Gezin', q: 'Welke aangifte in het jaar van echtscheidingsvonnis?', a: 'Onmiddellijk afzonderlijk vanaf het jaar van het vonnis. Bij feitelijke scheiding zonder vonnis blijf je dat jaar nog gezamenlijk indienen.' },
+    { cat: '04 · Gezin', q: 'Wat zijn de 3 voorwaarden voor fiscaal co-ouderschap (art. 132 bis WIB)?', a: '1) Gezamenlijke uitoefening van het ouderlijk gezag (onderhoudsplicht) door 2 BP die geen gezin vormen; 2) gelijke verdeling van de huisvesting van het kind; 3) geregistreerde of rechterlijke beslissing.' },
+    { cat: '04 · Gezin', q: 'Wat is het huwelijksquotiënt (HQ)?', a: 'Wanneer 1 echtgenoot weinig of geen inkomen heeft, wordt fictief 30% van het beroepsinkomen van de ander overgeheveld naar de minst verdienende partner, met een maximum (geïndexeerd). Resultaat: lagere progressieve belasting.' },
+    { cat: '04 · Gezin', q: 'Wanneer wordt iemand beschouwd als "ten laste"?', a: 'Bij deel uitmaken van het gezin op 1 januari van het AJ, geen eigen vergoeding van de aangever ontvangen, en NBM onder de grens. Voor kinderen alleenstaande ouder: NBM-grens iets ruimer.' },
+    { cat: '04 · Gezin', q: 'Welke uitkering telt NIET mee in NBM?', a: 'Kindergeld (=groeipakket) is volledig vrijgesteld. Ook bepaalde studiebeurzen en een eerste schijf onderhoudsgeld zijn vrijgesteld.' },
+
+    // 05 · Werknemer
+    { cat: '05 · Werknemer', q: 'Welke fiche krijg je als werknemer van je werkgever?', a: 'Fiche 281.10. Daarop staat brutoloon, ingehouden bedrijfsvoorheffing, sociale bijdragen en voordelen alle aard. De fiche is leidend voor de aangifte.' },
+    { cat: '05 · Werknemer', q: 'Wat is het wettelijk forfait voor beroepskosten van werknemers?', a: 'Geïndexeerd forfait dat automatisch wordt toegepast tenzij de werkelijke kosten worden bewezen. Het forfait wordt afgetrokken voor de berekening van het belastbaar beroepsinkomen.' },
+    { cat: '05 · Werknemer', q: 'Wat zijn maaltijdcheques en hoe worden ze fiscaal behandeld?', a: 'Werkgeversbijdrage aan maaltijdcheques (max ~€6,91 per cheque) is een belastingvrij voordeel. Eigen bijdrage van werknemer (min €1,09) is wel uit nettoloon. Geen VAA.' },
+    { cat: '05 · Werknemer', q: 'Hoe wordt het VAA voor PC/laptop/telefoon van het werk behandeld?', a: 'Pc: forfait €72/jaar privégebruik. Tablet: €36. Telefoon: €36 toestel + €48 abonnement = €84. Internet thuis: €60. Cijfers indicatief — check geïndexeerd bedrag voor het AJ.' },
+
+    // 06 · Kosten (Pro)
+    { cat: '06 · Kosten', q: 'Wat zijn de 3 grote categorieën voor autokosten?', a: 'Werk-werk (=beroeps km, gramformule, min 50%); woon-werk (=enkel €0,15/km forfait); zuiver privé (=0%, nooit aftrekbaar art. 49).' },
+    { cat: '06 · Kosten', q: 'Geef de algemene formule voor de gramformule.', a: '120% − (0,5% × coëff brandstof × g CO₂/km). Coëff: diesel = 1, benzine = 0,95, gas = 0,90. Begrensd: minimaal 50%, maximaal 100%. Vóór 1/1/2018 aangekocht: min 75%.' },
+    { cat: '06 · Kosten', q: 'Hoe worden beroepskosten geboekt voor zelfstandigen?', a: 'Werkelijke kosten worden gestaafd met facturen/bewijsstukken. Auto, kantoor, telefoon, … Privé deel wordt afgeschreven met een privé-percentage (bv. 70% beroep / 30% privé).' },
+    { cat: '06 · Kosten', q: 'Wat zijn niet-aftrekbare kosten?', a: 'Privé kosten (art. 49 WIB), restaurant boven het toegestane percentage, boetes, kleding niet specifiek werkkledij, persoonlijke voeding, en uitgaven zonder verband met het beroep.' },
+
+    // 07 · Bedrijfsleider (Pro)
+    { cat: '07 · Bedrijfsleider', q: 'Welke fiche krijgt een bedrijfsleider?', a: 'Fiche 281.20 (vergelijkbaar met 281.10 voor werknemers). Bevat alle inkomsten, voordelen alle aard en ingehouden bedrijfsvoorheffing.' },
+    { cat: '07 · Bedrijfsleider', q: 'Wat is het minimumloon dat een bedrijfsleider moet uitkeren om aan het verlaagd VenB-tarief te komen?', a: '€45.000/jaar (geïndexeerd). Anders verliest de vennootschap haar verlaagd tarief van 20% op de eerste schijf van €100.000 winst.' },
+
+    // 08 · Onroerend (Pro)
+    { cat: '08 · Onroerend', q: 'Hoeveel bedraagt de indexatiecoëfficiënt KI voor IJ 2024 (AJ 2025)?', a: '2,1763. Voor IJ 2025 (AJ 2026): 2,2446.' },
+    { cat: '08 · Onroerend', q: 'Wat is het verschil tussen pacht en loopbaanpacht?', a: 'Gewone pacht = aangifte van KI in code 1108 (huur wordt niet aangegeven). Loopbaanpacht = enkel onroerende voorheffing, geen aangifte in PB.' },
+    { cat: '08 · Onroerend', q: 'Wat doet de revaloratiecoëfficiënt 5,46/5,63?', a: 'Wordt gebruikt om het kostenforfait bij beroepsverhuur te berekenen (KI × 2/3 × 5,46) en om de bovengrens voor herkwalificatie van overdreven huur te berekenen (KI × 5/3 × 5,46). 5,46 = AJ 2025, 5,63 = AJ 2026.' },
+    { cat: '08 · Onroerend', q: 'Wat moet je doen voor buitenlands onroerend goed sinds AJ 2022?', a: 'Een KI aanvragen bij de Belgische fiscus, dat KI aangeven in Vak III A, en de vrijstelling vragen in Vak III B (B.1 met dubbelbelastingverdrag = 100%, B.2 zonder verdrag = 50%). Werkt via progressievoorbehoud.' },
+
+    // 09 · Zelfstandige (Pro)
+    { cat: '09 · Zelfstandige', q: 'Welke beroepskosten worden lineair afgeschreven?', a: 'Materiële vaste activa (machines, kantoor) en immateriële vaste activa (goodwill, software). Termijn ≥ 3 jaar. Wagens hebben specifieke regels (vaak 5 jaar).' },
+    { cat: '09 · Zelfstandige', q: 'Wat is het verschil tussen werkelijke kosten en kostenforfait voor zelfstandigen?', a: 'Werkelijke kosten = je bewijst elke uitgave (factuur, kasstuk). Kostenforfait = wettelijk percentage zonder bewijs (voor sommige categorieën). Voor zelfstandigen vaak werkelijke kosten gunstiger.' },
+    { cat: '09 · Zelfstandige', q: 'Hoeveel bedraagt het basis-tarief van de investeringsaftrek (AJ 2025)?', a: '8% voor KMO-natuurlijke personen, 13,5% voor energiebesparende investeringen, 30,5% voor digitalisering. Formulier 276U bijvoegen.' },
+    { cat: '09 · Zelfstandige', q: 'Wanneer kan een zelfstandige BTW recupereren?', a: 'Als BTW-belastingplichtige met aftrekrecht. De aftrekbare BTW wordt verrekend via de BTW-aangifte, niet via PB. Niet-aftrekbare BTW (bv. 50% personenwagen) is wel een beroepskost in PB.' },
+
+    // 10 · Baten (Pro)
+    { cat: '10 · Baten', q: 'Wat is het verschil tussen "winsten" (Vak XVI) en "baten" (Vak XVII)?', a: 'Winsten = inkomsten uit handels-/nijverheidsactiviteit (verkopen, productie). Baten = inkomsten uit vrije beroepen (advocaat, dokter, accountant). Beiden worden opgenomen in Deel 2 van de aangifte.' },
+    { cat: '10 · Baten', q: 'Welke beroepscategorieën vallen onder Vak XVII (baten)?', a: 'Vrije beroepen (advocaat, dokter, notaris, accountant, architect) en zelfstandigen zonder handelsactiviteit (consultants, kunstenaars). Inkomsten bestaan uit erelonen en honoraria.' },
+
+    // 11 · Onderhoud (Pro)
+    { cat: '11 · Onderhoud', q: 'In welk vak geef je ontvangen onderhoudsgelden aan?', a: 'Vak VI (ontvangen onderhoudsuitkeringen). 80% is belastbaar. De ontvanger geeft 80% van het bedrag aan, niet 100%.' },
+    { cat: '11 · Onderhoud', q: 'In welk vak geef je betaalde onderhoudsgelden aan?', a: 'Vak VIII (aftrekbare bestedingen — betaalde onderhoudsuitkeringen). 80% is aftrekbaar van het netto belastbaar inkomen.' },
+    { cat: '11 · Onderhoud', q: 'Mag je tegelijk onderhoudsgeld aftrekken én fiscaal co-ouderschap toepassen?', a: 'Niet voor DEZELFDE periode. Binnen een jaar wel, mits voor niet-overlappende periodes (bv. eerste 6 maanden onderhoudsgeld, laatste 6 maanden co-ouderschap).' },
+
+    // 12 · Vermindering (Pro)
+    { cat: '12 · Vermindering', q: 'Wat is het tarief van de vermindering voor kinderopvang?', a: '45% van de uitgaven, met maximum €15,70 per opvangdag per kind (AJ 2025). Voor kinderen jonger dan 14 jaar, of 21 als gehandicapt.' },
+    { cat: '12 · Vermindering', q: 'Wat is langetermijnsparen vs. pensioensparen?', a: 'Pensioensparen = aparte verzekering, max €1.020 (AJ 2025), 30% vermindering. Langetermijnsparen = oude levensverzekering of "tweede pijler", 30% vermindering op max afhankelijk van NBI.' },
+    { cat: '12 · Vermindering', q: 'Wat is een dienstencheque vermindering?', a: 'Gewest Vlaanderen: 20% vermindering op de eerste schijf van €1.660 dienstencheques/jaar per BP. Daarboven geen voordeel meer.' },
+
+    // 13 · Diverse (Pro)
+    { cat: '13 · Diverse', q: 'Geef 3 voorbeelden van diverse inkomsten.', a: 'Toevallige winsten/baten (vlooienmarkt, occasionele freelance), ontvangen onderhoudsgelden, prijzen/subsidies, meerwaarden op gronden/gebouwen binnen spertijd.' },
+    { cat: '13 · Diverse', q: 'Wanneer wordt een occasionele activiteit beschouwd als beroepsinkomen i.p.v. divers inkomen?', a: 'Bij regelmatigheid, organisatie en winstoogmerk. Eén-time AirBnB = divers (30%). Systematisch en georganiseerd verhuren = beroepsinkomen (progressief).' },
+
+    // 14 · Meerwaarde (Pro)
+    { cat: '14 · Meerwaarde', q: 'Wat is een spertijd en wat doet die?', a: 'Spertijd = periode tussen aankoop en verkoop. Binnen die periode wordt de meerwaarde belast als divers inkomen. Daarbuiten geen belasting. Voor gronden: 8 jaar; voor gebouwen: 5 jaar.' },
+    { cat: '14 · Meerwaarde', q: 'Welke "datum" telt voor de berekening van de spertijd?', a: 'Voor zowel aankoop als verkoop: de datum van het COMPROMIS (verkoopovereenkomst), NIET de notariële akte. Dat is een typische examenvraag.' },
+    { cat: '14 · Meerwaarde', q: 'Hoe bereken je de meerwaarde op een grond binnen 5 jaar?', a: 'Verkoopprijs − (aankoopprijs × 1,25 + €120 × aantal jaren bezit + bewezen kosten + opcentiemen). Belast aan 33%.' },
+
+    // 15 · Woning (Pro)
+    { cat: '15 · Woning', q: 'Voor welke leningen geldt de Vlaamse woonbonus generatie 1?', a: 'Hypothecaire leningen afgesloten tussen 1/1/2005 en 31/12/2014, voor de enige eigen woning. Vermindering 30-50% op max €2.280 + €760 (10j) + €80 (3+ ktl) per persoon.' },
+    { cat: '15 · Woning', q: 'Wat zijn de basisvoorwaarden voor een fiscaal voordeel woninglening?', a: '1) Hypothecaire lening; 2) looptijd minstens 10 jaar; 3) afgesloten bij financiële instelling in EER; 4) doel = woning in EER verwerven of behouden.' },
+    { cat: '15 · Woning', q: 'Sinds wanneer geeft de Vlaamse woonbonus geen voordeel meer?', a: 'Vanaf 1/1/2020 voor nieuwe leningen. Bestaande leningen vóór die datum behouden hun voordeel volgens de generatieregels (gen 1, gen 2, geïntegreerde woonbonus).' },
+    { cat: '15 · Woning', q: 'Welke codes hoor je bij de geïntegreerde woonbonus (lening vanaf 2016)?', a: 'Code 3334 / 4334 (KA + intresten samen). De premie SSV: code x335 (zodra de korf x334 vol is).' },
+    { cat: '15 · Woning', q: 'Wat is het federale "langetermijnsparen" voor een 2de woning?', a: '30% vermindering op (KA + intresten + premie SSV), max €2.350/persoon = max voordeel €705/persoon. Eén fiscale korf per persoon — gewestelijke woonbonus heeft voorrang.' }
   ];
 
   // run the app init on DOM ready

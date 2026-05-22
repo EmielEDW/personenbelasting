@@ -1,4 +1,14 @@
 .DS_Store
+.vercel
+node_modules/
+*.log
 *.swp
 .idea/
 .vscode/
+
+# Private code list — only the hashes in valid-codes.json are public
+codes-private.txt
+
+# Book PDF for research only — not for the public site
+Praktisch_Personenbelasting_2025.pdf
+*.book.pdf
