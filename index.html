@@ -41,8 +41,8 @@
     --shadow: 0 1px 2px rgba(31,27,22,.06), 0 4px 12px rgba(31,27,22,.06);
     --shadow-lg: 0 4px 24px rgba(31,27,22,.10);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
   body {
     font-family: 'Newsreader', Georgia, serif;
     background: var(--cream);
@@ -51,10 +51,21 @@
     line-height: 1.65;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -webkit-overflow-scrolling: touch;
     background-image:
       radial-gradient(ellipse at 20% 0%, rgba(168,122,31,0.04), transparent 50%),
       radial-gradient(ellipse at 80% 100%, rgba(107,39,55,0.04), transparent 50%);
   }
+  /* prevent long unbreakable strings (file paths, codes) from causing horizontal scroll */
+  pre, code, .formula, .data-table, table {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  img, svg, video, iframe { max-width: 100%; height: auto; }
 
   /* ===== HEADER ===== */
   .top-bar {
@@ -782,12 +793,170 @@
       padding-bottom: 16px;
       border-bottom: 1px solid var(--line);
     }
-    .top-bar-inner { padding: 12px 16px; flex-wrap: wrap; }
+    .top-bar-inner { padding: 12px 16px; flex-wrap: wrap; gap: 12px; }
     .search-wrap { order: 3; flex: 1 1 100%; max-width: none; }
     .hero h1 { font-size: clamp(36px, 9vw, 56px); }
     .chapter-num { font-size: 44px; min-width: 56px; }
     .chapter h2 { font-size: 26px; }
     .two-col { grid-template-columns: 1fr; }
+  }
+
+  /* ===== MOBILE (<= 720px) — explicit polish ===== */
+  @media (max-width: 720px) {
+    /* Top bar — make it readable + scrollable horizontally with snap, buttons big-thumb */
+    .top-bar-inner {
+      padding: 10px 12px;
+      gap: 8px;
+      flex-wrap: nowrap;       /* keep single row at top */
+    }
+    .brand { font-size: 17px; min-width: 0; flex: 0 1 auto; }
+    .brand .sub { display: none; }  /* hide subtitle on mobile to save space */
+    .top-actions {
+      order: 4;
+      flex: 1 1 100%;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+      flex-wrap: nowrap;
+    }
+    .top-actions::-webkit-scrollbar { display: none; }
+    .top-actions .btn {
+      padding: 11px 16px;
+      font-size: 14px;
+      flex-shrink: 0;
+      min-height: 42px;     /* big touch target */
+      font-weight: 500;
+    }
+    [data-pack-status] { flex-shrink: 0; }
+    [data-pack-status] .pack-badge { padding: 8px 14px; font-size: 12.5px; }
+
+    .search-wrap { order: 3; max-width: none; flex: 1 1 100%; }
+    .search-wrap input { padding: 12px 16px 12px 38px; font-size: 16px; /* iOS zoom guard */ }
+    .search-wrap::before { top: 14px; left: 12px; }
+    .search-results { max-height: 60vh; }
+
+    /* Hero & chapter typography */
+    .hero { padding: 22px 0 32px; margin-bottom: 32px; }
+    .hero h1 { font-size: clamp(34px, 11vw, 52px); line-height: 0.98; }
+    .hero p { font-size: 16.5px; }
+    .hero-stats { gap: 18px; }
+    .hero-stats .stat-num { font-size: 28px; }
+    .hero-meta { flex-wrap: wrap; gap: 6px 12px; }
+    .hero-disclaimer summary { font-size: 13px; padding: 10px 14px; }
+    .hero-disclaimer .disc-body { padding: 8px 16px 14px; font-size: 13.5px; }
+
+    .hero-docs { gap: 8px; }
+    .hero-doc-pill { font-size: 12px; padding: 7px 12px; }
+
+    /* Sidebar TOC: compact, scroll horizontally if needed */
+    .sidebar { max-height: 240px; padding-right: 4px; }
+    .sidebar-title { font-size: 10.5px; }
+    .toc a { padding: 9px 8px; font-size: 13.5px; }
+
+    /* Chapter content */
+    .chapter { margin-bottom: 36px; scroll-margin-top: 90px; }
+    .chapter-header { gap: 12px; padding-bottom: 14px; margin-bottom: 22px; }
+    .chapter-num { font-size: 36px; min-width: 48px; }
+    .chapter h2 { font-size: 22px; line-height: 1.15; }
+    .chapter-kicker { font-size: 10px; }
+    .content-block h3 { font-size: 19px; }
+    .content-block h4 { font-size: 15.5px; }
+    .data-table th, .data-table td { padding: 8px 10px; font-size: 13px; }
+    .formula { padding: 14px 16px; font-size: 13px; }
+    .key-fact, .examen { padding: 14px 16px; }
+    .examen::before { left: 10px; }
+
+    /* Two-col already 1fr from base media query */
+
+    /* Documents drawer */
+    .docs-drawer-panel { width: 100%; }
+    .docs-drawer-header {
+      padding: 12px 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .docs-drawer-title { font-size: 16px; flex: 1 1 auto; min-width: 0; }
+    .docs-drawer-title .accent { display: inline; }
+    .docs-search { flex: 1 1 100%; max-width: none; order: 3; }
+    .docs-search input { font-size: 16px; padding: 10px 14px 10px 36px; }
+    .docs-close { width: 34px; height: 34px; flex-shrink: 0; }
+    .docs-drawer-body { padding: 14px 14px 60px; }
+    .docs-intro { padding: 12px 14px; font-size: 13.5px; margin-bottom: 18px; }
+    .docs-group { margin-bottom: 24px; }
+    .docs-group-title { font-size: 15px; }
+    .docs-grid { grid-template-columns: 1fr; gap: 10px; }
+    .doc-card { padding: 12px; gap: 10px; }
+    .doc-card .doc-icon { font-size: 22px; }
+    .doc-title { font-size: 14px; }
+    .doc-desc { font-size: 12.5px; }
+    .doc-filename {
+      overflow-wrap: anywhere;
+      word-break: break-all;
+      white-space: normal;
+      font-size: 10.5px;
+    }
+    .doc-meta { flex-wrap: wrap; gap: 6px; }
+
+    /* Document viewer modal */
+    .doc-viewer-modal { padding: 0; }
+    .doc-viewer-card { border-radius: 0; height: 100%; }
+    .doc-viewer-title { font-size: 13.5px; }
+    .doc-viewer-btn { padding: 8px 12px; font-size: 12px; }
+
+    /* Flashcards modal */
+    .modal-overlay { padding: 16px; }
+    .flashcard-container { max-width: 100%; }
+    .card-face { padding: 26px 22px; }
+    .card-content { font-size: 20px; }
+    .card-back .card-content { font-size: 16px; }
+    .flashcard-controls { flex-wrap: wrap; gap: 8px; }
+    .flashcards-cta { flex-direction: column; gap: 10px; align-items: stretch; text-align: center; }
+    .flashcards-cta .cta-btn { width: 100%; }
+
+    /* Compact drawer */
+    .compact-section-title { font-size: 18px; }
+    .compact-card { padding: 14px 16px; }
+    .compact-card h4 { font-size: 15px; }
+    .compact-card .stappen { font-size: 12.5px; }
+    .compact-card .formule { font-size: 11.5px; padding: 8px 10px; }
+
+    /* Calculators drawer */
+    .calc-tabs { padding: 0 8px; gap: 0; }
+    .calc-tab { padding: 11px 10px; font-size: 12.5px; }
+    .calc-body { padding: 16px 14px 60px; }
+    .calc-card { padding: 16px; gap: 14px; grid-template-columns: 1fr; }
+    .calc-field input, .calc-field select { font-size: 16px; padding: 10px 12px; }
+    .calc-out { padding: 14px 16px; }
+    .calc-out-line { font-size: 12px; }
+    .calc-out-line .val { font-size: 14px; }
+    .calc-out-line.result .val { font-size: 20px; }
+    .calc-disclaimer { font-size: 12.5px; padding: 12px 14px; }
+
+    /* Promo & chapters paywall */
+    .hero-pack-promo { padding: 18px 18px; gap: 14px; }
+    .hero-pack-promo h3 { font-size: 18px; }
+    .hero-pack-promo p { font-size: 13px; }
+    .chapter-paywall { padding: 22px 18px; margin-bottom: 22px; }
+    .chapter-paywall h3 { font-size: 18px; }
+    .chapter-paywall p { font-size: 14px; }
+
+    /* Unlock modal */
+    .pb-unlock-content { padding: 22px 18px 18px; max-height: 90vh; overflow-y: auto; }
+    .pb-unlock-content h2 { font-size: 22px; }
+    .pb-unlock-lead { font-size: 14px; }
+    .pb-unlock-features li { font-size: 13.5px; }
+    .pb-unlock-buy { padding: 14px 18px; }
+    .pb-unlock-buy .pb-price { font-size: 22px; }
+    .pb-unlock-input-row { flex-direction: column; gap: 8px; }
+    .pb-unlock-input-row input,
+    .pb-unlock-input-row button { width: 100%; }
+    .pb-unlock-input-row input { font-size: 16px; }
+
+    /* FAB out of way of bottom nav */
+    .fab { bottom: 16px; right: 16px; width: 48px; height: 48px; font-size: 18px; }
   }
 
   @media print {
