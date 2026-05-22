@@ -90,9 +90,84 @@
   }
   .search-wrap::before {
     content: '⌕';
-    position: absolute; left: 14px; top: 50%;
-    transform: translateY(-50%);
+    position: absolute; left: 14px; top: 16px;
     color: var(--ink-mute); font-size: 18px;
+    pointer-events: none;
+  }
+  .search-results {
+    position: absolute;
+    top: calc(100% + 6px); left: 0; right: 0;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(31,27,22,0.15);
+    max-height: 480px;
+    overflow-y: auto;
+    z-index: 90;
+  }
+  .search-results[hidden] { display: none; }
+  .search-results-group {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .search-results-group:last-child { border-bottom: 0; }
+  .search-results-group-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+    padding: 6px 16px;
+    font-weight: 600;
+  }
+  .search-result {
+    display: block;
+    padding: 9px 16px;
+    text-decoration: none;
+    color: var(--ink);
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background .12s;
+  }
+  .search-result:hover, .search-result.active {
+    background: var(--cream-light);
+    border-left-color: var(--brass);
+  }
+  .search-result-title {
+    font-family: 'Fraunces', serif;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .search-result-meta {
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .search-result-snippet {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .search-result-snippet mark {
+    background: var(--highlight);
+    color: var(--ink);
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  .search-result-empty {
+    padding: 18px 16px;
+    color: var(--ink-mute);
+    font-size: 13px;
+    font-style: italic;
+    text-align: center;
   }
   .top-actions { display: flex; gap: 8px; align-items: center; }
   .btn {
@@ -595,6 +670,50 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
   }
+  .flashcard-counter-wrap {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+  }
+  .flashcard-tier {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(252,248,238,0.12);
+    color: var(--cream-light);
+  }
+  .flashcard-tier.pack {
+    background: linear-gradient(135deg, var(--sage), #6F8A6B);
+    color: white;
+  }
+  .flashcards-cta {
+    margin-top: 18px;
+    background: linear-gradient(135deg, var(--wine) 0%, var(--ink) 100%);
+    color: var(--cream);
+    padding: 14px 18px;
+    border-radius: 10px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .flashcards-cta .cta-icon { font-size: 20px; flex-shrink: 0; }
+  .flashcards-cta .cta-text { flex: 1; min-width: 0; color: rgba(252,248,238,0.92); }
+  .flashcards-cta .cta-text strong { color: var(--brass-soft); font-weight: 700; }
+  .flashcards-cta .cta-btn {
+    padding: 8px 16px;
+    background: var(--cream);
+    color: var(--wine);
+    border: none;
+    border-radius: 999px;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform .12s;
+  }
+  .flashcards-cta .cta-btn:hover { transform: translateY(-1px); }
+  body.pb-unlocked .flashcards-cta { display: none; }
   .modal-close {
     position: absolute;
     top: 24px; right: 24px;
@@ -1295,6 +1414,224 @@
     .hero-pack-promo { flex-direction: column; align-items: stretch; }
   }
 
+  /* ===== COMPACTE CURSUS DRAWER ===== */
+  .compact-drawer {
+    position: fixed; inset: 0;
+    background: rgba(31,27,22,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 150;
+    display: none;
+    align-items: stretch; justify-content: center;
+  }
+  .compact-drawer.show { display: flex; }
+  .compact-drawer-panel {
+    width: min(1200px, 100%);
+    background: var(--cream);
+    box-shadow: 0 -8px 24px rgba(31,27,22,0.18);
+    display: flex; flex-direction: column;
+    margin-top: 4vh; margin-bottom: 0;
+    border-radius: 16px 16px 0 0;
+    animation: slideUp .25s ease;
+    overflow: hidden;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .compact-header {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--cream-light) 0%, var(--cream) 100%);
+    display: flex; align-items: center; gap: 16px;
+  }
+  .compact-title {
+    font-family: 'Fraunces', serif;
+    font-size: 24px; font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    flex: 1;
+  }
+  .compact-title em { color: var(--wine); font-style: italic; }
+  .compact-title .sub {
+    display: block;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--ink-mute);
+    margin-top: 2px;
+    font-family: 'Newsreader', serif;
+  }
+  .compact-close {
+    width: 36px; height: 36px;
+    border: 1px solid var(--line);
+    background: var(--cream);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .compact-close:hover { border-color: var(--wine); color: var(--wine); }
+  .compact-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px 80px;
+  }
+  .compact-intro {
+    background: linear-gradient(135deg, #FFF9F0, #FCF2E1);
+    border-left: 3px solid var(--brass);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 32px;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .compact-intro strong { color: var(--ink); }
+  .compact-section { margin-bottom: 40px; }
+  .compact-section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--wine);
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--wine);
+  }
+  .compact-section-sub {
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-bottom: 18px;
+    font-style: italic;
+  }
+  .compact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 16px;
+  }
+  .compact-card {
+    background: var(--cream-light);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: flex; flex-direction: column;
+    gap: 10px;
+    transition: all .15s;
+  }
+  .compact-card:hover {
+    border-color: var(--brass);
+    box-shadow: var(--shadow);
+  }
+  .compact-card h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 16.5px; font-weight: 600;
+    color: var(--ink);
+    line-height: 1.25;
+    margin: 0;
+  }
+  .compact-card .opdracht-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--brass);
+    font-weight: 600;
+  }
+  .compact-card .stappen {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .compact-card .stappen ol {
+    margin: 0; padding-left: 20px;
+  }
+  .compact-card .stappen li {
+    margin-bottom: 4px;
+  }
+  .compact-card .stappen li::marker { color: var(--brass); }
+  .compact-card .pitfalls {
+    background: #FFF5F2;
+    border-left: 3px solid var(--vermillion-soft);
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+  .compact-card .pitfalls::before {
+    content: '⚠ ';
+    color: var(--vermillion);
+    font-weight: 700;
+  }
+  .compact-card .formule {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .compact-card .formule .res { color: var(--vermillion-soft); font-weight: 600; }
+  .compact-card .formule .op { color: var(--brass-soft); }
+  .compact-card .doc-link {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px dashed var(--line);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px;
+    color: var(--wine);
+    text-decoration: none;
+    transition: color .15s;
+    cursor: pointer;
+  }
+  .compact-card .doc-link:hover { color: var(--wine-soft); }
+  .compact-card .doc-link::before {
+    content: '↗';
+    font-weight: 700;
+  }
+
+  .compact-paywall {
+    text-align: center;
+    padding: 60px 30px;
+    background: linear-gradient(140deg, #FFF9F0 0%, #FCE9D8 100%);
+    border: 1px solid var(--brass);
+    border-radius: 12px;
+    margin: 24px;
+  }
+  .compact-paywall .pw-icon {
+    font-size: 56px; line-height: 1; margin-bottom: 12px;
+  }
+  .compact-paywall h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: var(--wine);
+    margin-bottom: 10px;
+  }
+  .compact-paywall p {
+    max-width: 520px;
+    margin: 0 auto 22px;
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .compact-paywall button {
+    padding: 13px 28px;
+    background: var(--wine);
+    color: var(--cream);
+    border: none;
+    border-radius: 999px;
+    font-family: inherit; font-size: 15px; font-weight: 500;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .compact-paywall button:hover { background: var(--wine-soft); }
+
+  @media (max-width: 720px) {
+    .compact-drawer-panel { margin-top: 0; border-radius: 0; }
+    .compact-grid { grid-template-columns: 1fr; }
+  }
+
   /* ===== UNLOCK MODAL (rendered by auth.js) ===== */
   .pb-unlock-modal {
     position: fixed; inset: 0;
@@ -1484,14 +1821,14 @@
   <div class="top-bar-inner">
     <div class="brand">Personenbelasting<span class="sub">— studiesamenvatting</span></div>
     <div class="search-wrap">
-      <input type="text" id="search" placeholder="Zoek in alle hoofdstukken…">
+      <input type="text" id="search" placeholder="Zoek in alles — hoofdstukken, kaartjes, documenten…" autocomplete="off">
+      <div class="search-results" id="search-results" hidden></div>
     </div>
     <div class="top-actions">
       <span data-pack-status></span>
-      <button class="btn" id="filter-examen" title="Toon alleen examen-onderwerpen">Examen-modus</button>
+      <button class="btn" id="open-compact" title="Compacte cursus — alle oefeningen overzichtelijk">📐 Compact</button>
       <button class="btn" id="open-docs" title="Open documentenbibliotheek">📁 Documenten</button>
       <button class="btn" id="open-flashcards" title="Open flashcards">🃏 Flashcards</button>
-      <button class="btn btn-icon" id="expand-all" title="Alles open/dicht">⇕</button>
       <button class="btn btn-icon" onclick="window.print()" title="Print">🖶</button>
     </div>
   </div>
@@ -3203,8 +3540,16 @@
     </div>
     <div class="flashcard-controls">
       <button class="btn" id="prev-card">‹ Vorige</button>
-      <span class="flashcard-counter" id="card-counter">1 / 20</span>
+      <div class="flashcard-counter-wrap">
+        <span class="flashcard-counter" id="card-counter">1 / 20</span>
+        <span class="flashcard-tier" id="card-tier">gratis</span>
+      </div>
       <button class="btn" id="next-card">Volgende ›</button>
+    </div>
+    <div class="flashcards-cta" id="flashcards-cta" hidden>
+      <span class="cta-icon">🔒</span>
+      <span class="cta-text">Je hebt nu <strong id="cta-free-count">36</strong> gratis kaarten. Ontgrendel <strong id="cta-pack-count">+87</strong> extra met het Examen-pack (€9,99).</span>
+      <button class="cta-btn" data-open-unlock type="button">Ontgrendel</button>
     </div>
   </div>
 </div>
@@ -3228,14 +3573,27 @@
   </div>
 </div>
 
+<!-- ===== COMPACTE CURSUS DRAWER ===== -->
+<div class="compact-drawer" id="compact-drawer">
+  <div class="compact-drawer-panel">
+    <div class="compact-header">
+      <div class="compact-title">
+        📐 Compacte <em>cursus</em>
+        <span class="sub">Alle oefeningen die je moet kunnen — met stappenplan en valkuilen</span>
+      </div>
+      <button class="compact-close" id="close-compact" title="Sluiten">✕</button>
+    </div>
+    <div class="compact-body" id="compact-body"></div>
+  </div>
+</div>
+
 <!-- ===== DOCUMENT VIEWER MODAL ===== -->
 <div class="doc-viewer-modal" id="doc-viewer-modal">
   <div class="doc-viewer-card">
     <div class="doc-viewer-header">
       <div class="doc-viewer-icon" id="doc-viewer-icon">📄</div>
       <div class="doc-viewer-title" id="doc-viewer-title">Document</div>
-      <a class="doc-viewer-btn" id="doc-viewer-external" target="_blank" rel="noopener" title="Open in nieuw tabblad">↗ Nieuw tabblad</a>
-      <a class="doc-viewer-btn primary" id="doc-viewer-download" download title="Download bestand">⬇ Download</a>
+      <a class="doc-viewer-btn primary" id="doc-viewer-external" target="_blank" rel="noopener" title="Open in nieuw tabblad">↗ Nieuw tabblad</a>
       <button class="doc-viewer-close" id="doc-viewer-close" title="Sluiten (Esc)">✕</button>
     </div>
     <div class="doc-viewer-body">
@@ -3271,9 +3629,396 @@
     injectHeroDocs();
     bindDocsEvents();
     bindDocViewerEvents();
+    bindCompactEvents();
     bindPaywallEvents();
     applyPaywall();          // run again to tag doc-link elements created by the steps above
   }
+
+  // ===== COMPACTE CURSUS — exercise reference ====================
+  // Each Vak section contains a list of exercise cards with steps + pitfalls
+  // + optional formule + link to the official solution document.
+  // Free for everyone (mostly free content), but full structure is shown only
+  // after unlock. We show the first section unlocked + a paywall for the rest.
+  const COMPACT_CURSUS = [
+    {
+      vak: 'Vak II',
+      titel: 'Persoonlijke gegevens & gezinslasten',
+      sub: 'Boek p. 59 — peildatum 1/1 van AJ, BVS, ten laste',
+      kaarten: [
+        {
+          titel: 'Oef. 1, 2, 4 p.100 — Gezinssituatie + BVS',
+          type: 'Berekening verhoging BVS',
+          stappen: [
+            'Bepaal de gezinstoestand op <strong>1 januari van het AJ</strong> (peildatum).',
+            'Tel kinderen ten laste — check elke NBM-grens (kotstudent, alleenstaande ouder).',
+            'Tel ascendenten ten laste (zorg dat hun NBM &lt; grens).',
+            'Bepaal de basis-BVS (€10.570) + verhogingen per kind + kind &lt;3 + alleenstaande + mantelzorg.',
+            'Vul in vak II.B: code 1030 (alleenstaand=1, gehuwd=2), code 1034 voor kinderen, etc.',
+          ],
+          pitfall: 'Werkelijk alleenstaand ≠ alleenstaand! Wijkagent controleert. Doodgeboren kindje telt voor dat jaar wél ten laste.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Opl_oef_1_p._100_VakII.docx',
+          docType: 'docx',
+          docTitle: 'Vak II — opl. oef. 1 p.100',
+        },
+      ],
+    },
+    {
+      vak: 'Vak III',
+      titel: 'Onroerende inkomsten',
+      sub: 'Boek p. 107 — KI, indexatie 2,1763 (IJ2024) / 2,2446 (IJ2025), revalorisatie 5,46 (AJ25) / 5,63 (AJ26)',
+      kaarten: [
+        {
+          titel: 'Gevallen 1-5, 7, 8 p.135-136 — Identificatie en code-toewijzing',
+          type: 'Code Vak III bepalen',
+          stappen: [
+            'Identificeer per OG: <strong>eigen woning</strong>, verhuurd-privé, verhuurd-beroeps, grond, pacht, buitenland.',
+            'Wijs juiste code toe (1100 eigen woning vrijgesteld, 1106 privé-verhuur, 1107 grond, 1108 pacht, 1109/1110 beroeps, 1112/1113 land&tuinbouw).',
+            'Indexeer KI (× 2,1763 voor IJ2024) — alleen in berekening, niet in aangifte!',
+            'Verdeel KI over partners: gehuwd = 50/50, wettelijk samenwonend = volgens eigendomsaandeel.',
+          ],
+          formule: '<span class="op">KI codes optellen geïndexeerd:</span><br>1106 × 2,1763 × 1,40 (privé verhuur)<br>1107 × 2,1763 (gronden)<br>1109 × 2,1763 × 1,40 (beroeps)<br>+ huurexcedenten<br>= <span class="res">Totaal A</span>',
+          pitfall: 'Eigen beroep deel = code 1105 (niet belastbaar maar wél invullen). Eigen woning binnen EER ook vrijgesteld sinds AJ 2008.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Opl_geval_1-5_p.135_Vak_III_Onroerende_inkomsten.docx',
+          docType: 'docx',
+          docTitle: 'Vak III — opl. gevallen 1-5 p.135',
+        },
+        {
+          titel: 'Oef. 12 & 13 p.136 — Beroepsverhuur + huurexcedent',
+          type: 'Kostenforfait + huurexcedent',
+          stappen: [
+            'Bereken brutohuur (huur + afgewentelde lasten zoals OV).',
+            'Bereken het kostenforfait: <strong>laagste van twee</strong> grenzen.',
+            'Bepaal huurexcedent = (brutohuur − kostenforfait) − geïndexeerd KI × 1,40.',
+            'Vul in: KI × % in code 1109, huur in code 1110.',
+          ],
+          formule: '<span class="op">Kostenforfait =</span><br>min[ KI × 2/3 × 5,46 ; brutohuur × 40% ]',
+          pitfall: 'Voor gedeelde KI bij verhuur aan natuurlijke persoon → vereist <strong>geregistreerd huurcontract</strong>. Anders alles als beroep.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Opl_oef_12_en_13_p._136_ivm_VakIII.docx',
+          docType: 'docx',
+          docTitle: 'Vak III — opl. oef. 12 & 13 p.136',
+        },
+      ],
+    },
+    {
+      vak: 'Vak IV',
+      titel: 'Bezoldigingen werknemers',
+      sub: 'Boek p. 141 — netto belastbaar loon, fiche 281.10, VAA',
+      kaarten: [
+        {
+          titel: 'Oef. 2-6 p.237-239 — Netto belastbaar loon werknemer',
+          type: 'Bezoldigingsberekening',
+          stappen: [
+            'Start van <strong>bruto loon</strong> volgens fiche 281.10.',
+            'Trek af: persoonlijke sociale zekerheidsbijdragen (RSZ).',
+            'Voeg toe: alle <strong>voordelen alle aard</strong> (VAA wagen, woning, energie, …).',
+            'Voeg toe: belastbare vergoedingen (achterstallen, opzegging, …).',
+            'Trek af: <em>vrijgestelde sociale voordelen</em> (maaltijdcheque tot €6,91 etc.).',
+            'Vul in op code 1250.',
+          ],
+          formule: '<span class="op">VAA firmawagen =</span><br>cataloguswaarde × (dagen/jaar) × CO₂%<br>CO₂% = 5,5% + 0,1% × (CO₂ − 18)<br>= <span class="res">belastbaar voordeel</span>',
+          pitfall: 'Eigen bijdrage werknemer aftrekken van VAA. Hybride: cataloguswaarde gewone wagen. Elektrisch: forfait CO₂% = 4%.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Opl_Oef_2_p_237_Vak_IV.docx',
+          docType: 'docx',
+          docTitle: 'Vak IV — opl. oef. 2 p.237',
+        },
+        {
+          titel: 'Excel oef. 8 p.239 — Belastingberekening tot aanslag',
+          type: 'Volledige PB-aanslag',
+          stappen: [
+            'GBI (bezoldigingen + andere) → totaal NBI.',
+            'Aftrekbare bestedingen (onderhoudsgeld 80%).',
+            'Toepas tarieven: 25% / 40% / 45% / 50%.',
+            'Trek belasting op BVS af (basis €10.570 + verhogingen).',
+            'Trek af: verminderingen (giften 45%, pensioensparen 30%, kinderopvang 45%, …).',
+            'Gemeentebelasting bv. 7% (per gemeente verschillend).',
+            'Trek af: BV + voorafbetalingen.',
+            '= <strong>te betalen / terug te krijgen</strong>.',
+          ],
+          pitfall: 'BVS-belasting wordt apart berekend (tegen progressieve tarieven op de BVS) en afgetrokken. Niet zomaar 25% van BVS!',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/excel_oef_8_p.239_Vak_IV.xlsx',
+          docType: 'xlsx',
+          docTitle: 'Vak IV — Excel oef. 8 p.239',
+        },
+      ],
+    },
+    {
+      vak: 'Vak VIII',
+      titel: 'Aftrekbare bestedingen — onderhoudsgeld',
+      sub: 'Boek p. 311 — 80%-regel, 3 voorwaarden, kapitalisatie',
+      kaarten: [
+        {
+          titel: 'Oef. 2 p.316 — Aftrek betaalde onderhoudsgelden',
+          type: 'Aftrek 80% Vak VIII',
+          stappen: [
+            'Check 3 voorwaarden: onderhoudsplicht bestaat, ontvanger woont apart, regelmatige betaling.',
+            'Tel betaalde onderhoudsgelden op (incl. medische kosten via vonnis).',
+            'Bereken <strong>80% × betaald</strong>.',
+            'Vul in: code 1390 (man) / 2390 (vrouw).',
+          ],
+          formule: 'Aftrek = <span class="res">betaalde onderhoudsgelden × 80%</span>',
+          pitfall: 'Eenmalige kapitalisatie wordt gespreid: bij ontvanger spread over leeftijds-coëfficiënt; bij betaler ineens 80% aftrekken. Géén combinatie met fiscaal co-ouderschap voor dezelfde periode.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Opl_oef_2_p._316_mbt_aftrekbare_bestedingen_Vak_VIII_betaalde_onderhoudsgelden.docx',
+          docType: 'docx',
+          docTitle: 'Vak VIII — opl. oef. 2 p.316',
+        },
+      ],
+    },
+    {
+      vak: 'Vak IX',
+      titel: 'Woningfiscaliteit',
+      sub: 'Boek p. 319 — eigen woning ja/nee + jaar van lening = bepalend',
+      kaarten: [
+        {
+          titel: 'Oef. 4 p.406, oef. 6 p.407 — Woningfiscaliteit-aangifte',
+          type: 'Aangifte woonbonus / langetermijnsparen',
+          stappen: [
+            'Startvraag 1: <strong>Eigen woning?</strong> Ja → gewestelijk (IX.I), Nee → federaal (IX.II).',
+            'Startvraag 2: <strong>Jaar lening</strong>? Vóór 2005 / 2005-2014 / 2015 / 2016+ / 2020+.',
+            'Identificeer generatie woonbonus + maximum korf.',
+            'Maak korven aan per partner (vrije verdeling indien voordelig).',
+            'Vermenigvuldig met tariefpercentage (30-50% gen 1, 40% gen 2 + geïntegreerde).',
+            'Aangifte: codes 3370/4370 (gen 1) of 3334/4334 (geïntegreerde) of x335 voor SSV.',
+          ],
+          formule: '<span class="op">Vlaamse gen 1 (lening 2014):</span><br>Korf = €2.280 vast + €760 (10j) + €80 (3+ ktl)<br>Voordeel/persoon = €3.120 × 50% = <span class="res">€1.560</span>',
+          pitfall: 'Vanaf 1/1/2020 GEEN woonbonus meer! Federaal "langetermijnsparen" voor 2de woning: 30% × max €2.350 = €705. Eén korf per persoon — gewestelijk heeft voorrang.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/opl_oef_4_p._406_Vak_IX.docx',
+          docType: 'docx',
+          docTitle: 'Vak IX — opl. oef. 4 p.406',
+        },
+      ],
+    },
+    {
+      vak: 'Vak X',
+      titel: 'Belastingverminderingen',
+      sub: 'Boek p. 411 — gewestelijk (X.I) + federaal (X.II)',
+      kaarten: [
+        {
+          titel: 'Oef. 1-4 p.480 — Vermindering kinderopvang',
+          type: 'Belastingvermindering kinderopvang',
+          stappen: [
+            'Voorwaarden: kind &lt;14 jaar (21 zwaar gehandicapt), ouder heeft beroepsinkomen, attest aanwezig.',
+            'Tel opvangdagen × dagvergoeding (max €15,70 per dag per kind, AJ 2025).',
+            'Cap aan beroepsinkomen.',
+            'Vermenigvuldig × 45% belastingvermindering.',
+            'Aangifte: code 1384.',
+          ],
+          formule: '<span class="op">Vermindering =</span><br>min(opvangdagen × €15,70 ; werkelijke uitgaven) × <span class="res">45%</span>',
+          pitfall: 'Niet combineerbaar met BVS-verhoging "kind &lt;3" voor hetzelfde kind. Kies de gunstigste. Werkelijk alleenstaand → bijkomende federale vermindering.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Opl_oef_1_tem_4_p.480_Vak_X_berekening_kosten_kinderopvang.docx',
+          docType: 'docx',
+          docTitle: 'Vak X — opl. oef. 1-4 p.480',
+        },
+        {
+          titel: 'Oef. 4 p.481 — Pensioensparen + giften',
+          type: 'Federale verminderingen',
+          stappen: [
+            'Pensioensparen: max €1.020/persoon (AJ 2025), 30% vermindering.',
+            'Giften: min €40 per instelling, vermindering 45%.',
+            'Bij koppels: <strong>proportioneel</strong> verdelen volgens NBI.',
+            'Aangifte: code 1361 (pensioensparen), code 1394 (giften).',
+          ],
+          formule: 'Pensioensparen max voordeel = €1.020 × <span class="res">30% = €306/persoon</span><br>Giften: bedrag × <span class="res">45%</span>',
+          pitfall: 'Pensioensparen 2de regeling (€1.310 @ 25%) bestaat — vragen ze niet op examen.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/opl_oef_4_p481_Vak_X.docx',
+          docType: 'docx',
+          docTitle: 'Vak X — opl. oef. 4 p.481',
+        },
+      ],
+    },
+    {
+      vak: 'Vak XV / Meerwaarden',
+      titel: 'Meerwaarde op gronden en gebouwen',
+      sub: 'Boek p. 543 — spertijden, registratie- vs aankoopwaarde',
+      kaarten: [
+        {
+          titel: 'Oef. 2 p.554 — Meerwaarde grond binnen spertijd',
+          type: 'Diverse inkomsten — meerwaarde',
+          stappen: [
+            'Bepaal aankoop- en verkoopdatum (= <strong>compromis</strong>, niet notariële akte!).',
+            'Bereken spertijd: binnen 5 jaar (33%) / 5-8 jaar (16,5%) / na 8 jaar (vrijgesteld).',
+            'Aankoopprijs × 1,25 = referentiebasis.',
+            'Toevoegen: bewezen kosten + opcentiemen + forfait €120/jaar bezit.',
+            'Vergelijken met verkoopprijs: positief verschil = meerwaarde.',
+            'Toepas tarief op meerwaarde → aangifte code 1208 (binnen 5j) of 1209 (5-8j).',
+          ],
+          formule: '<span class="op">Belastbaar (gronden) =</span><br>verkoopprijs − (aankoopprijs × 1,25 + €120/jaar bezit + kosten + opcentiemen)<br>× <span class="res">33% (binnen 5j) / 16,5% (5-8j) / 0% (na 8j)</span>',
+          pitfall: '"Grond" = gebouw &lt;30% van waarde. Registratiewaarde is basis indien hoger dan aankoopprijs. Datum compromis telt!',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_DAG (1)/oef_2_p_554_mbt_meerwaarde_gronden_Deel_II_Vak_XV.docx',
+          docType: 'docx',
+          docTitle: 'Vak XV — oef. 2 p.554',
+        },
+      ],
+    },
+    {
+      vak: 'Vak XVI',
+      titel: 'Diverse inkomsten',
+      sub: 'Boek p. 527 — deeleconomie, occasioneel, Airbnb',
+      kaarten: [
+        {
+          titel: 'Toepassing Airbnb',
+          type: 'Onroerend / divers',
+          stappen: [
+            'Identificeer huurregime: doorlopende dienstverlening = beroep (Vak XVIII), occasioneel = divers (Vak XVI).',
+            'Splits in roerend deel (40% bruto, code 1156) + onroerend deel.',
+            'Bereken huurinkomen apart van schoonmaak/onthaal-services.',
+            'Schoonmaakkosten zijn aftrekbaar van diensten-deel.',
+          ],
+          pitfall: 'Vanaf 30+ dagen/jaar regelmatig → beroep, niet meer divers. BTW-plicht kan ontstaan.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Toepassing_DI_Voorbeeld_Airbnb.docx',
+          docType: 'docx',
+          docTitle: 'Toepassing — diverse inkomsten (Airbnb)',
+        },
+        {
+          titel: 'Oef. 1, 3, 4 p.578-579 — Diverse inkomsten',
+          type: 'Belastbaar tarief 30% / 33%',
+          stappen: [
+            'Identificeer soort: occasionele winst/baten, ontvangen onderhoudsgeld, prijzen, meerwaarden.',
+            'Pas vrijstellingen toe (eerste schijf, kindergeld, etc.).',
+            'Forfaitaire kosten 20% indien geen werkelijke kosten bewezen.',
+            'Aangifte tegen 30% (DI roerend) of 33% (occasioneel) of 16,5% (meerwaarde gebouw).',
+          ],
+          pitfall: 'Bij ontbreken van beroepsinkomen worden DI gelijkgesteld aan beroepsinkomsten (progressief).',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Opl_oef_1_p578_Vak_XVI.docx',
+          docType: 'docx',
+          docTitle: 'Vak XVI — opl. oef. 1 p.578',
+        },
+      ],
+    },
+    {
+      vak: 'Vak XVII',
+      titel: 'Winsten zelfstandige + afschrijving + investeringsaftrek',
+      sub: 'Boek p. 581 — exploitatiewinst, KVG, formulier 276U',
+      kaarten: [
+        {
+          titel: 'Oef. afschr + invest aftrek p.725',
+          type: 'Afschrijving + investeringsaftrek',
+          stappen: [
+            'Bepaal aanschaffingswaarde + bijkomende kosten + niet-aftrekbare BTW.',
+            'Kies afschrijvingsmethode: lineair (gewoon) of degressief (mag op machines).',
+            'Bereken afschrijvingen per jaar — eerste jaar mogelijk pro rata.',
+            'Investeringsaftrek: percentage op aanschaffingswaarde (basisaftrek KMO 8%, energie 13,5%, digitaal 30,5%).',
+            'Voorwaarden: nieuw, beroeps-uitsluitend, in België aangekocht, afschrijvingstermijn ≥3j.',
+            '<strong>Formulier 276U bijvoegen</strong>, anders geen aftrek.',
+          ],
+          formule: 'Lineair: aanschaffingswaarde × (1 ÷ levensduur)<br>Degressief: max 2 × lineair, max 40%/jaar<br>Invest. aftrek: aanschaffingswaarde × <span class="res">8% (basis) of 13,5% (energie) of 30,5% (digitaal)</span>',
+          pitfall: 'Degressief NIET voor wagens. Niet-aftrekbare BTW op personenwagens (50%) = wel beroepskost in PB. Formulier 276U vergeten = 0 aftrek.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/opl_oef_op_afschr_en_invest_aftrek_p725.docx',
+          docType: 'docx',
+          docTitle: 'Vak XVII — opl. afschr + invest p.725',
+        },
+        {
+          titel: 'Oef. 4 p.726 — Aftrekbare kosten zelfstandige',
+          type: 'Beroepskosten',
+          stappen: [
+            'Bereken bruto exploitatiewinst (omzet − KVG, incl. VAA, huur, subsidies).',
+            'Identificeer aftrekbare kosten: hou met % beroepsgebruik rekening.',
+            'Restaurant 69%, receptie 50%, autokosten gramformule.',
+            'Aftrek sociale bijdragen (niet de wettelijke verhogingen!).',
+            'Aftrek bezoldiging/toekenning meewerkend echtgenoot (max 30% winst).',
+            '= netto beroepsinkomen in code 1606.',
+          ],
+          pitfall: 'Privé kosten = art. 49 WIB, NOOIT aftrekbaar. Kledij enkel werkkledij (uniform). Boetes nooit. Receptie 50% sinds Cassatie-arrest.',
+          doc: '01_Cursus_van_leerkracht/Leerpad_Personenbelasting_WPL_DAG/Opl_oef_4_p_726_Vak_XVII_aftrekbare_kosten.docx',
+          docType: 'docx',
+          docTitle: 'Vak XVII — opl. oef. 4 p.726',
+        },
+      ],
+    },
+    {
+      vak: 'Globaal',
+      titel: 'Globale oefening — volledige PB-berekening',
+      sub: 'Boek p. 804 — alle vakken samen',
+      kaarten: [
+        {
+          titel: 'Globale oefening 3 p.804 — volledig dossier',
+          type: 'Examensimulatie',
+          stappen: [
+            '<strong>1. Persoonlijke gegevens</strong>: Vak II — bepaal BVS-verhogingen.',
+            '<strong>2. Onroerend inkomen</strong>: Vak III — codes, indexatie, kostenforfait.',
+            '<strong>3. Roerend</strong>: Vak VII — vrijstelling €1.020 spaarrekening, dividenden.',
+            '<strong>4. Beroepsinkomsten</strong>: Vak IV (werknemer) of XVII (zelfstandige) of XVIII (vrij beroep).',
+            '<strong>5. Vorige verliezen + aftrekbare bestedingen</strong>: Vak VIII (onderhoudsgeld 80%).',
+            '<strong>6. Woningfiscaliteit</strong>: Vak IX — generatie + korf + tarief.',
+            '<strong>7. Verminderingen</strong>: Vak X — giften, pensioensparen, kinderopvang.',
+            '<strong>8. Diverse</strong>: Vak XV/XVI — meerwaarden, occasioneel.',
+            '<strong>9. Belastingberekening</strong>: tarieven → basisbelasting → BVS-aftrek → verminderingen → hoofdsom → gemeentebelasting → BV/voorafbetalingen.',
+          ],
+          formule: '<span class="op">Schema:</span> GBI → aftrekbare bestedingen → tarieven → BVS-vermindering → verminderingen → +7% gemeente → −voorheffingen = <span class="res">netto te betalen / terug</span>',
+          pitfall: 'Volgorde fout = alles fout. Eerst per categorie netto maken, dan optellen. Verminderingen zijn op belasting, aftrekbare bestedingen zijn op inkomen.',
+          doc: 'Leerpad_Personenbelasting_DAG(2)/Opl_Globale_oefening_3_pag804.docx',
+          docType: 'docx',
+          docTitle: 'Opl. globale oefening 3 p.804',
+        },
+      ],
+    },
+  ];
+
+  // First section is free preview; the rest is pack-only
+  const COMPACT_FREE_COUNT = 1;
+
+  function renderCompact() {
+    const body = document.getElementById('compact-body');
+    if (!body) return;
+    const unlocked = isPackUnlocked();
+    let html = `<div class="compact-intro">
+      <strong>📐 Hoe gebruiken?</strong> Elke kaart bevat het <em>type opgave</em>, het stappenplan om hem op te lossen, een formule indien relevant, en de typische valkuilen. Klik onderaan de kaart om de oplossing-docx te openen. Studeer per Vak, of bekijk de globale oefening om alles te integreren.
+    </div>`;
+
+    COMPACT_CURSUS.forEach((sec, secIdx) => {
+      const sectionLocked = !unlocked && secIdx >= COMPACT_FREE_COUNT;
+      html += `<section class="compact-section">
+        <h2 class="compact-section-title">${escapeHtml(sec.vak)} — ${escapeHtml(sec.titel)}</h2>
+        <div class="compact-section-sub">${escapeHtml(sec.sub)}</div>`;
+      if (sectionLocked) {
+        html += `<div class="compact-paywall" style="padding:32px 24px;margin:0;background:linear-gradient(140deg,#FFF9F0 0%,#FCE9D8 100%);">
+          <div class="pw-icon" style="font-size:36px;margin-bottom:6px;">🔒</div>
+          <p style="margin-bottom:14px"><strong>Dit deel zit in het Examen-pack.</strong> Je bekijkt nu de gratis preview (Vak II).</p>
+          <button data-open-unlock type="button">💎 Ontgrendel alle ${COMPACT_CURSUS.length} secties · €9,99</button>
+        </div>`;
+      } else {
+        html += `<div class="compact-grid">`;
+        sec.kaarten.forEach(k => {
+          const docHref = k.doc ? encodePath(k.doc) : '#';
+          html += `<div class="compact-card">
+            <span class="opdracht-type">${escapeHtml(k.type)}</span>
+            <h4>${escapeHtml(k.titel)}</h4>
+            <div class="stappen"><ol>${k.stappen.map(s => '<li>' + s + '</li>').join('')}</ol></div>
+            ${k.formule ? `<div class="formule">${k.formule}</div>` : ''}
+            ${k.pitfall ? `<div class="pitfalls">${k.pitfall}</div>` : ''}
+            ${k.doc ? `<a class="doc-link" href="${docHref}" data-doc-path="${escapeHtml(k.doc)}" data-doc-type="${k.docType}" data-doc-title="${escapeHtml(k.docTitle)}">Open oplossing: ${escapeHtml(k.docTitle)}</a>` : ''}
+          </div>`;
+        });
+        html += `</div>`;
+      }
+      html += `</section>`;
+    });
+
+    body.innerHTML = html;
+    applyPaywall(); // tag new doc-links
+  }
+
+  function openCompact() {
+    const drawer = document.getElementById('compact-drawer');
+    if (!drawer) return;
+    renderCompact();
+    drawer.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCompact() {
+    document.getElementById('compact-drawer')?.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  function bindCompactEvents() {
+    document.getElementById('open-compact')?.addEventListener('click', openCompact);
+    document.getElementById('close-compact')?.addEventListener('click', closeCompact);
+    document.getElementById('compact-drawer')?.addEventListener('click', e => {
+      if (e.target.id === 'compact-drawer') closeCompact();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('compact-drawer')?.classList.contains('show')) closeCompact();
+    });
+  }
+  window.openCompact = openCompact;
 
   // ===== PAYWALL ===========================================================
   // Free chapters: 1-5. Pro chapters: 6-15.
@@ -3377,7 +4122,12 @@
 
   function bindPaywallEvents() {
     if (window.PBAuth && typeof window.PBAuth.onChange === 'function') {
-      window.PBAuth.onChange(() => applyPaywall());
+      window.PBAuth.onChange(() => {
+        applyPaywall();
+        // Refresh open drawers if their content depends on lock state
+        if (document.getElementById('compact-drawer')?.classList.contains('show')) renderCompact();
+        updateFlashcardsTier();
+      });
     }
   }
 
@@ -3401,9 +4151,7 @@
   }
 
   function bindEvents() {
-    document.getElementById('search').addEventListener('input', e => doSearch(e.target.value));
-    document.getElementById('filter-examen').addEventListener('click', toggleExamenFilter);
-    document.getElementById('expand-all').addEventListener('click', expandAll);
+    bindSearchSuggest();
     document.getElementById('open-flashcards').addEventListener('click', openFlashcards);
     document.getElementById('close-flashcards').addEventListener('click', closeFlashcards);
     document.getElementById('flashcard').addEventListener('click', flipCard);
@@ -3507,28 +4255,263 @@
   }
 
   // ===== SEARCH =====
-  function doSearch(query) {
-    const q = query.trim().toLowerCase();
-    document.querySelectorAll('.chapter').forEach(ch => {
-      // remove old highlights
-      ch.querySelectorAll('.search-hit').forEach(el => {
-        const parent = el.parentNode;
-        parent.replaceChild(document.createTextNode(el.textContent), el);
-        parent.normalize();
-      });
+  // We build a search index from the chapter content, flashcards and documents.
+  // The dropdown shows top results grouped by type. Click → jump + highlight.
+  let __searchIndex = null;
+  let __searchActiveIndex = -1;
 
-      if (!q) {
-        ch.dataset.hidden = 'false';
+  function buildSearchIndex() {
+    if (__searchIndex) return __searchIndex;
+    const idx = [];
+
+    document.querySelectorAll('.chapter').forEach(ch => {
+      const num = ch.dataset.num;
+      const titleEl = ch.querySelector('h2');
+      const title = titleEl ? titleEl.textContent.trim() : '';
+      // index per content-block heading so suggestions are granular
+      ch.querySelectorAll('.chapter-content .content-block, .chapter-content .examen, .chapter-content .key-fact').forEach(block => {
+        const heading = block.querySelector('h3, h4, h5');
+        const headText = heading ? heading.textContent.trim() : '';
+        const text = block.textContent.trim().replace(/\s+/g, ' ');
+        if (!text) return;
+        idx.push({
+          type: 'chapter',
+          title: headText || title,
+          subtitle: `Hoofdstuk ${num} · ${title}`,
+          text,
+          chapter: parseInt(num, 10),
+          anchor: ch.id,
+          element: block,
+        });
+      });
+      // Also index the chapter as a whole
+      idx.push({
+        type: 'chapter-main',
+        title: `Hoofdstuk ${num} — ${title}`,
+        subtitle: ch.querySelector('.chapter-kicker')?.textContent.trim() || '',
+        text: ch.textContent.replace(/\s+/g, ' '),
+        chapter: parseInt(num, 10),
+        anchor: ch.id,
+        element: ch,
+      });
+    });
+
+    if (Array.isArray(window.__allFlashcards)) {
+      window.__allFlashcards.forEach((c, i) => {
+        idx.push({
+          type: 'card',
+          title: c.q,
+          subtitle: c.cat,
+          text: c.q + ' ' + c.a,
+          chapter: flashcardChapterNum(c) || 99,
+          cardIndex: i,
+        });
+      });
+    }
+
+    if (Array.isArray(window.DOCUMENTS || DOCUMENTS)) {
+      const docs = window.DOCUMENTS || DOCUMENTS;
+      docs.forEach(d => {
+        idx.push({
+          type: 'doc',
+          title: d.title,
+          subtitle: (d.tags || []).slice(0,4).join(' · ') || d.group,
+          text: d.title + ' ' + (d.tags || []).join(' ') + ' ' + (d.desc || ''),
+          doc: d,
+        });
+      });
+    }
+
+    __searchIndex = idx;
+    return idx;
+  }
+
+  function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  function highlightSnippet(text, q) {
+    const lower = text.toLowerCase();
+    const idx = lower.indexOf(q);
+    if (idx === -1) return escapeHtml(text.slice(0, 140));
+    const start = Math.max(0, idx - 40);
+    const end = Math.min(text.length, idx + q.length + 80);
+    const before = (start > 0 ? '… ' : '') + escapeHtml(text.slice(start, idx));
+    const match = '<mark>' + escapeHtml(text.slice(idx, idx + q.length)) + '</mark>';
+    const after = escapeHtml(text.slice(idx + q.length, end)) + (end < text.length ? ' …' : '');
+    return before + match + after;
+  }
+
+  function scoreResult(item, q) {
+    const tl = item.title.toLowerCase();
+    if (tl === q) return 100;
+    if (tl.startsWith(q)) return 80;
+    if (tl.includes(q)) return 60;
+    if (item.subtitle && item.subtitle.toLowerCase().includes(q)) return 40;
+    if (item.text.toLowerCase().includes(q)) return 20;
+    return 0;
+  }
+
+  function renderSearchResults(query) {
+    const box = document.getElementById('search-results');
+    if (!box) return;
+    const q = query.trim().toLowerCase();
+    if (!q) { box.hidden = true; box.innerHTML = ''; __searchActiveIndex = -1; return; }
+    if (q.length < 2) { box.hidden = true; return; }
+
+    const idx = buildSearchIndex();
+    const unlocked = isPackUnlocked();
+
+    // Score and filter
+    const scored = idx
+      .map(item => ({ item, score: scoreResult(item, q) }))
+      .filter(x => x.score > 0)
+      .sort((a, b) => b.score - a.score);
+
+    // De-dup chapter+chapter-main blocks for the same anchor (keep highest score per anchor)
+    const seen = new Set();
+    const ordered = [];
+    for (const x of scored) {
+      const key = x.item.anchor ? `${x.item.type}:${x.item.anchor}` : `${x.item.type}:${x.item.title}`;
+      // For chapter-main + chapter, both map to the chapter; allow at most 1 chapter result + 1 block result per chapter
+      const altKey = x.item.anchor && x.item.type === 'chapter' ? `block:${x.item.anchor}:${x.item.title}` : null;
+      if (seen.has(key) || (altKey && seen.has(altKey))) continue;
+      seen.add(key);
+      if (altKey) seen.add(altKey);
+      ordered.push(x.item);
+      if (ordered.length >= 24) break;
+    }
+
+    if (!ordered.length) {
+      box.innerHTML = '<div class="search-result-empty">Geen resultaten voor "' + escapeHtml(query) + '"</div>';
+      box.hidden = false;
+      return;
+    }
+
+    // Group
+    const groups = { chapter: [], card: [], doc: [] };
+    for (const item of ordered) {
+      if (item.type === 'card') groups.card.push(item);
+      else if (item.type === 'doc') groups.doc.push(item);
+      else groups.chapter.push(item);
+    }
+
+    const labels = { chapter: '📖 Samenvatting', card: '🃏 Flashcards', doc: '📁 Documenten' };
+    let html = '';
+    for (const key of ['chapter', 'card', 'doc']) {
+      const items = groups[key].slice(0, 8);
+      if (!items.length) continue;
+      html += `<div class="search-results-group"><div class="search-results-group-title">${labels[key]} <span style="opacity:.6">(${items.length})</span></div>`;
+      items.forEach((it, i) => {
+        const isLocked = (it.type === 'card' && it.chapter > FREE_CHAPTER_MAX && !unlocked) ||
+                         (it.type === 'doc' && it.doc && isDocPro(it.doc) && !unlocked) ||
+                         (it.type === 'chapter' && it.chapter > FREE_CHAPTER_MAX && !unlocked) ||
+                         (it.type === 'chapter-main' && it.chapter > FREE_CHAPTER_MAX && !unlocked);
+        const lockBadge = isLocked ? ' <span style="font-size:11px;color:var(--wine)">🔒 Pack</span>' : '';
+        const snippetSrc = it.text || '';
+        const snippet = highlightSnippet(snippetSrc, q);
+        html += `<a class="search-result" href="javascript:void(0)" data-key="${key}" data-idx="${idx.indexOf(it)}">
+          <div class="search-result-title">${escapeHtml(it.title)}${lockBadge}</div>
+          ${it.subtitle ? `<div class="search-result-meta">${escapeHtml(it.subtitle)}</div>` : ''}
+          <div class="search-result-snippet">${snippet}</div>
+        </a>`;
+      });
+      html += '</div>';
+    }
+    box.innerHTML = html;
+    box.hidden = false;
+    __searchActiveIndex = -1;
+  }
+
+  function selectSearchResult(item) {
+    const box = document.getElementById('search-results');
+    const input = document.getElementById('search');
+    if (!item) return;
+    if (item.type === 'card') {
+      openFlashcards();
+      // If locked, just open the unlock modal
+      if (item.chapter > FREE_CHAPTER_MAX && !isPackUnlocked()) {
+        window.PBAuth && window.PBAuth.openUnlockModal();
+      } else {
+        // jump to that card in the filtered deck
+        const target = flashcards.find(c => c.q === item.title);
+        const idx = flashcards.indexOf(target);
+        if (idx >= 0) { state.cardIndex = idx; renderCard(); }
+      }
+    } else if (item.type === 'doc') {
+      const d = item.doc;
+      if (isDocPro(d) && !isPackUnlocked()) {
+        window.PBAuth && window.PBAuth.openUnlockModal();
+      } else {
+        openDocInline(d.path, d.type, d.title);
+      }
+    } else if (item.anchor) {
+      if (item.chapter > FREE_CHAPTER_MAX && !isPackUnlocked()) {
+        window.PBAuth && window.PBAuth.openUnlockModal();
         return;
       }
+      const el = document.getElementById(item.anchor);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.classList.remove('collapsed');
+        highlightInElement(el, input.value.trim().toLowerCase());
+        setTimeout(() => {
+          // remove inline highlights after a while
+          el.querySelectorAll('.search-hit').forEach(s => {
+            const p = s.parentNode;
+            p.replaceChild(document.createTextNode(s.textContent), s);
+            p.normalize();
+          });
+        }, 6000);
+      }
+    }
+    box.hidden = true;
+    input.blur();
+  }
 
-      const txt = ch.textContent.toLowerCase();
-      if (txt.includes(q)) {
-        ch.dataset.hidden = 'false';
-        ch.classList.remove('collapsed');
-        highlightInElement(ch, q);
-      } else {
-        ch.dataset.hidden = 'true';
+  function bindSearchSuggest() {
+    const input = document.getElementById('search');
+    const box = document.getElementById('search-results');
+    if (!input || !box) return;
+    let debounce;
+    input.addEventListener('input', e => {
+      clearTimeout(debounce);
+      const v = e.target.value;
+      debounce = setTimeout(() => renderSearchResults(v), 80);
+    });
+    input.addEventListener('focus', () => {
+      if (input.value.trim().length >= 2) renderSearchResults(input.value);
+    });
+    document.addEventListener('click', e => {
+      if (e.target.closest('.search-wrap')) return;
+      box.hidden = true;
+    });
+    box.addEventListener('click', e => {
+      const r = e.target.closest('.search-result');
+      if (!r) return;
+      const idxRaw = r.dataset.idx;
+      if (idxRaw == null) return;
+      const item = (__searchIndex || [])[parseInt(idxRaw, 10)];
+      selectSearchResult(item);
+    });
+    input.addEventListener('keydown', e => {
+      const items = [...box.querySelectorAll('.search-result')];
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        __searchActiveIndex = (__searchActiveIndex + 1) % Math.max(1, items.length);
+        items.forEach((el, i) => el.classList.toggle('active', i === __searchActiveIndex));
+        items[__searchActiveIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        __searchActiveIndex = (__searchActiveIndex - 1 + items.length) % Math.max(1, items.length);
+        items.forEach((el, i) => el.classList.toggle('active', i === __searchActiveIndex));
+        items[__searchActiveIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') {
+        if (__searchActiveIndex >= 0 && items[__searchActiveIndex]) {
+          e.preventDefault();
+          items[__searchActiveIndex].click();
+        }
+      } else if (e.key === 'Escape') {
+        box.hidden = true;
+        input.blur();
       }
     });
   }
@@ -3613,11 +4596,37 @@
   }
   function renderCard() {
     const c = flashcards[state.cardIndex];
+    if (!c) return;
     document.getElementById('card-category').textContent = c.cat;
     document.getElementById('card-question').textContent = c.q;
     document.getElementById('card-answer').textContent = c.a;
     document.getElementById('card-counter').textContent = `${state.cardIndex + 1} / ${flashcards.length}`;
     document.getElementById('flashcard').classList.remove('flipped');
+    updateFlashcardsTier();
+  }
+
+  function updateFlashcardsTier() {
+    const tierEl = document.getElementById('card-tier');
+    const ctaEl  = document.getElementById('flashcards-cta');
+    const freeCntEl = document.getElementById('cta-free-count');
+    const packCntEl = document.getElementById('cta-pack-count');
+    const unlocked = isPackUnlocked();
+    const totalAll = (window.__allFlashcards || flashcards).length;
+    const totalFree = (window.__allFlashcards || flashcards).filter(c => {
+      const cnum = flashcardChapterNum(c);
+      return cnum === null || cnum <= FREE_CHAPTER_MAX;
+    }).length;
+    if (tierEl) {
+      tierEl.textContent = unlocked
+        ? `pack actief · ${totalAll} kaarten`
+        : `gratis · ${totalFree} van ${totalAll}`;
+      tierEl.classList.toggle('pack', unlocked);
+    }
+    if (ctaEl) {
+      ctaEl.hidden = unlocked;
+      if (freeCntEl) freeCntEl.textContent = totalFree;
+      if (packCntEl) packCntEl.textContent = '+' + (totalAll - totalFree);
+    }
   }
   function nextCard() {
     state.cardIndex = (state.cardIndex + 1) % flashcards.length;
@@ -3920,14 +4929,11 @@
     const titleEl = document.getElementById('doc-viewer-title');
     const iconEl  = document.getElementById('doc-viewer-icon');
     const ext     = document.getElementById('doc-viewer-external');
-    const dl      = document.getElementById('doc-viewer-download');
     const loading = document.getElementById('doc-viewer-loading');
     const href    = encodePath(path);
 
     titleEl.textContent = title || path.split('/').pop();
     iconEl.textContent  = getDocIcon(type);
-    dl.href  = href;
-    dl.setAttribute('download', path.split('/').pop());
     loading.classList.remove('error');
     loading.style.display = 'flex';
     loading.textContent = 'Document laden…';
