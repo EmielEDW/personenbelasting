@@ -107,3 +107,34 @@ Klaar voor live als test werkt → flip Stripe naar **live mode**, update env va
 - ✅ `valid-codes.json` is wel public (bevat alleen hashes, geen leesbare codes)
 - ✅ Het book PDF `Praktisch_Personenbelasting_2025.pdf` is gitignored
 - ✅ Test telkens met **devtools open** dat de free chapters zichtbaar zijn maar ch 6-15 enkel content tonen na unlock
+
+---
+
+## 7. Analytics — Vercel + Hotjar
+
+### Vercel Web Analytics (gratis, no-cookie)
+
+1. Vercel → project `personenbelasting` → tab **Analytics**
+2. Klik **Enable Web Analytics**
+3. Klaar — de site stuurt al `va('event', …)` calls (zie ook custom events hieronder)
+
+Wat je krijgt: bezoekers, top pagina's, devices, landen, referrers, custom events. Free tier = 2.500 events/maand.
+
+**Custom events die de site al stuurt:**
+- `open_compact` · `open_calculators` · `open_docs` · `open_flashcards` · `open_doc` · `open_unlock_modal` · `pack_state_change`
+
+Filter op event-name in Vercel Analytics → "Events" tab.
+
+### Hotjar (gratis tot 35 sessies/dag, heatmaps + recordings)
+
+1. Maak account op [hotjar.com](https://insights.hotjar.com/register)
+2. Voeg nieuwe site toe (jouw Vercel-domein)
+3. Kopieer je **Site ID** (cijfer, bv. `3812345`)
+4. Open `index.html`, zoek `const HOTJAR_SITE_ID = 0;`
+5. Vervang `0` door je site ID
+6. Commit + push → Vercel deployt → Hotjar begint sessies op te nemen
+
+Een paar minuten later zie je in Hotjar dashboard:
+- Heatmaps (waar klikt iedereen, hoever scrollen ze)
+- Session recordings (letterlijke schermopnames, voor UX-debugging)
+- Funnel analytics

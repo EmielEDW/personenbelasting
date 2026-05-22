@@ -8,6 +8,32 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked@13.0.2/marked.min.js"></script>
+
+<!-- ===== Vercel Web Analytics (privacy-first, no cookies) ===== -->
+<!-- Activeer in Vercel dashboard: project → Analytics → Enable -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
+<!-- ===== Hotjar (heatmaps + session recordings) =====
+     Sign up at hotjar.com → kopieer je Site ID en plak hieronder.
+     Laat HOTJAR_SITE_ID op 0 zodat het script niets uitvoert tot je hem invult. -->
+<script>
+  (function() {
+    const HOTJAR_SITE_ID = 0; // ← vervang door je echte Hotjar ID (bv. 3812345)
+    if (!HOTJAR_SITE_ID) return;
+    (function(h,o,t,j,a,r){
+      h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+      h._hjSettings={hjid:HOTJAR_SITE_ID,hjsv:6};
+      a=o.getElementsByTagName('head')[0];
+      r=o.createElement('script');r.async=1;
+      r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+      a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+  })();
+</script>
+
 <script src="auth.js"></script>
 <style>
   :root {
@@ -2130,6 +2156,7 @@
           <p>Deze samenvatting is gemaakt op basis van de <strong>lesopnames van de leerkracht</strong> en aangevuld met info uit het handboek <em>Praktisch Personenbelasting 2025</em> (S. Hugelier, Van In). De documenten zijn de hoofdbron — het boek is voornamelijk extra context.</p>
           <p><strong>Normaal zou alles correct moeten zijn</strong>, maar ik heb het niet persoonlijk woord-voor-woord gecontroleerd. PB-fiscaliteit is complex en jaarlijks gewijzigd — als je een fout vermoedt: check altijd het officiële handboek, de aangifte of de indextabel.</p>
           <p>De <strong>calculators</strong> zijn handige hulpmiddelen om je oefeningen te checken, maar PB-formules hebben veel uitzonderingen en grensgevallen. Voor het examen blijft de <em>methodologie</em> belangrijker dan een snelle tool. Gebruik ze om je antwoorden te verifiëren, niet als ultiem bewijs.</p>
+          <p><strong>Privacy:</strong> deze site gebruikt anonieme bezoekersstatistieken (Vercel Analytics, geen cookies, geen tracking over websites) zodat ik weet welke onderdelen mensen nuttig vinden. Eventueel <em>session-replays</em> (Hotjar) om de UX te verbeteren — geen persoonsgegevens. Geen advertenties, geen verkoop aan derden.</p>
           <p style="color: var(--ink-mute); font-style: italic;">Vragen, fouten gespot of suggesties? Mail naar <a href="mailto:info@emieldewaele.com">info@emieldewaele.com</a> — ik fix het meteen. Succes met studeren.</p>
         </div>
       </details>
@@ -3903,6 +3930,19 @@
   // ===== FLASHCARDS DATA =====
   let flashcards = [];
 
+  // ===== ANALYTICS HELPERS =====
+  // Wrappers so we can call from anywhere without breaking if analytics is missing.
+  function track(name, data) {
+    try {
+      if (typeof window.va === 'function') {
+        window.va('event', { name, ...(data || {}) });
+      }
+      if (typeof window.hj === 'function') {
+        window.hj('event', name);
+      }
+    } catch (e) { /* analytics never breaks UX */ }
+  }
+
   // ===== INIT =====
   function init() {
     buildTOC();
@@ -4794,6 +4834,7 @@
     renderCalcBody();
     drawer.classList.add('show');
     document.body.style.overflow = 'hidden';
+    track('open_calculators', { unlocked: isPackUnlocked() });
   }
   function closeCalc() {
     document.getElementById('calc-drawer')?.classList.remove('show');
@@ -4816,6 +4857,7 @@
     renderCompact();
     drawer.classList.add('show');
     document.body.style.overflow = 'hidden';
+    track('open_compact', { unlocked: isPackUnlocked() });
   }
   function closeCompact() {
     document.getElementById('compact-drawer')?.classList.remove('show');
@@ -4935,7 +4977,8 @@
 
   function bindPaywallEvents() {
     if (window.PBAuth && typeof window.PBAuth.onChange === 'function') {
-      window.PBAuth.onChange(() => {
+      window.PBAuth.onChange((evt) => {
+        track('pack_state_change', { state: evt });
         applyPaywall();
         // Refresh open drawers if their content depends on lock state
         if (document.getElementById('compact-drawer')?.classList.contains('show')) renderCompact();
@@ -5246,6 +5289,7 @@
       openFlashcards();
       // If locked, just open the unlock modal
       if (item.chapter > FREE_CHAPTER_MAX && !isPackUnlocked()) {
+        track('open_unlock_modal', { source: 'search' });
         window.PBAuth && window.PBAuth.openUnlockModal();
       } else {
         // jump to that card in the filtered deck
@@ -5256,12 +5300,14 @@
     } else if (item.type === 'doc') {
       const d = item.doc;
       if (isDocPro(d) && !isPackUnlocked()) {
+        track('open_unlock_modal', { source: 'search' });
         window.PBAuth && window.PBAuth.openUnlockModal();
       } else {
         openDocInline(d.path, d.type, d.title);
       }
     } else if (item.anchor) {
       if (item.chapter > FREE_CHAPTER_MAX && !isPackUnlocked()) {
+        track('open_unlock_modal', { source: 'search' });
         window.PBAuth && window.PBAuth.openUnlockModal();
         return;
       }
@@ -5403,6 +5449,7 @@
   window.flashcards = flashcards; // expose for paywall filter
   function openFlashcards() {
     document.getElementById('flashcards-modal').classList.add('show');
+    track('open_flashcards', { unlocked: isPackUnlocked() });
   }
   function closeFlashcards() {
     document.getElementById('flashcards-modal').classList.remove('show');
@@ -5741,6 +5788,7 @@
   const OFFICE_TYPES = ['docx', 'doc', 'pptx', 'ppt', 'xlsx', 'xls'];
 
   function openDocInline(path, type, title) {
+    track('open_doc', { type, title });
     const modal   = document.getElementById('doc-viewer-modal');
     const frame   = document.getElementById('doc-viewer-frame');
     const titleEl = document.getElementById('doc-viewer-title');
@@ -5864,6 +5912,7 @@
       // If document is locked behind the paywall, open the unlock modal instead
       if (link.dataset.docLocked === '1') {
         e.preventDefault();
+        track('open_unlock_modal', { source: 'locked_doc', doc: link.dataset.docPath });
         if (window.PBAuth && typeof window.PBAuth.openUnlockModal === 'function') {
           window.PBAuth.openUnlockModal();
         }
@@ -5886,6 +5935,7 @@
     }
     drawer.classList.add('show');
     document.body.style.overflow = 'hidden';
+    track('open_docs');
     setTimeout(() => document.getElementById('docs-search')?.focus(), 100);
   }
   function closeDocs() {
