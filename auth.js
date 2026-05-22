@@ -134,7 +134,7 @@
   });
 
   // === Unlock modal ===
-  const STRIPE_URL = (window.__PB_STRIPE_URL__) || 'https://buy.stripe.com/REPLACE_WITH_YOUR_PAYMENT_LINK';
+  const STRIPE_URL = (window.__PB_STRIPE_URL__) || 'https://buy.stripe.com/cNidR874R6pM9I8aR0d3i01';
   const PRICE_TAG = '€9,99';
 
   function buildModal() {
