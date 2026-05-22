@@ -93,6 +93,126 @@
     color: var(--ink-mute); font-size: 14px;
     margin-left: 8px;
   }
+
+  /* ===== Brand dropdown (site switcher) ===== */
+  .brand-wrap { position: relative; flex: 0 1 auto; min-width: 0; }
+  .brand-btn {
+    background: none;
+    border: 0;
+    padding: 4px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font: inherit;
+    text-align: left;
+    transition: background .15s;
+  }
+  .brand-btn:hover { background: var(--cream-light); }
+  .brand-btn[aria-expanded="true"] { background: var(--cream-light); }
+  .brand-text { display: inline-flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .brand-caret {
+    font-size: 12px;
+    color: var(--ink-mute);
+    transition: transform .2s;
+  }
+  .brand-btn[aria-expanded="true"] .brand-caret { transform: rotate(180deg); }
+
+  .brand-menu {
+    position: absolute;
+    top: calc(100% + 8px); left: 0;
+    width: min(420px, calc(100vw - 32px));
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 12px 36px rgba(31,27,22,0.18);
+    z-index: 110;
+    padding: 14px;
+    animation: bm-pop .2s ease;
+  }
+  .brand-menu[hidden] { display: none; }
+  @keyframes bm-pop {
+    from { transform: translateY(-4px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .brand-menu-head { padding: 4px 6px 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+  .bm-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 600;
+  }
+  .bm-sub {
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-top: 4px;
+    line-height: 1.4;
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+  }
+  .brand-menu-list { display: flex; flex-direction: column; gap: 4px; }
+  .bm-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: background .15s;
+  }
+  .bm-item.bm-link { cursor: pointer; }
+  .bm-item.bm-link:hover { background: var(--cream-light); }
+  .bm-item.active { background: var(--cream-light); }
+  .bm-item-icon { font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+  .bm-item-body { flex: 1; min-width: 0; }
+  .bm-item-title {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .bm-item-desc {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .bm-current {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    background: var(--sage);
+    color: white;
+    padding: 1px 6px;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .bm-arrow {
+    color: var(--wine);
+    font-weight: 700;
+    transition: transform .2s;
+  }
+  .bm-item.bm-link:hover .bm-arrow { transform: translateX(3px); }
+  .brand-menu-foot {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    font-size: 12px;
+    color: var(--ink-mute);
+    text-align: center;
+    line-height: 1.5;
+  }
+  .brand-menu-foot a { color: var(--wine); text-decoration: none; }
+  .brand-menu-foot a:hover { text-decoration: underline; }
   .search-wrap {
     flex: 1; max-width: 420px;
     position: relative;
@@ -2456,7 +2576,37 @@
 
 <div class="top-bar">
   <div class="top-bar-inner">
-    <div class="brand">Personenbelasting<span class="sub">— studiesamenvatting</span></div>
+    <div class="brand-wrap">
+      <button class="brand brand-btn" id="brand-toggle" aria-expanded="false" aria-haspopup="true">
+        <span class="brand-text">Personenbelasting<span class="sub">— complete samenvatting</span></span>
+        <span class="brand-caret">▾</span>
+      </button>
+      <div class="brand-menu" id="brand-menu" hidden>
+        <div class="brand-menu-head">
+          <span class="bm-tag">📚 Samenvattingen door Emiel</span>
+          <p class="bm-sub">Complete examensamenvattingen voor het Graduaat Accounting Administration (HoGent).</p>
+        </div>
+        <div class="brand-menu-list">
+          <div class="bm-item active" aria-current="page">
+            <div class="bm-item-icon">📘</div>
+            <div class="bm-item-body">
+              <div class="bm-item-title">Personenbelasting <span class="bm-current">huidige</span></div>
+              <div class="bm-item-desc">Aanslagjaar 2025 · 15 hoofdstukken · alle Vak III-XVII oefeningen</div>
+            </div>
+          </div>
+          <a class="bm-item bm-link" href="https://venootschapsrecht.emieldewaele.com" target="_blank" rel="noopener" onclick="if(window.va)window.va('event',{name:'cross_link_click',site:'venr',source:'brand_dropdown'});">
+            <div class="bm-item-icon">⚖️</div>
+            <div class="bm-item-body">
+              <div class="bm-item-title">Vennootschapsrecht <span class="bm-arrow">↗</span></div>
+              <div class="bm-item-desc">WVV · BV / NV / CV / VOF / maatschap · vergelijkende tabel · flashcards</div>
+            </div>
+          </a>
+        </div>
+        <div class="brand-menu-foot">
+          Wil je dat ik nog een vak uitwerk? <a href="mailto:info@emieldewaele.com">Mail het me</a>.
+        </div>
+      </div>
+    </div>
     <div class="search-wrap">
       <input type="text" id="search" placeholder="Zoek in alles — hoofdstukken, kaartjes, documenten…" autocomplete="off">
       <div class="search-results" id="search-results" hidden></div>
@@ -5376,8 +5526,31 @@
     });
   }
 
+  function bindBrandMenu() {
+    const btn = document.getElementById('brand-toggle');
+    const menu = document.getElementById('brand-menu');
+    if (!btn || !menu) return;
+    function toggle(open) {
+      const isOpen = (open !== undefined) ? open : menu.hidden;
+      menu.hidden = !isOpen;
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      toggle();
+      if (!menu.hidden && typeof track === 'function') track('open_brand_menu');
+    });
+    document.addEventListener('click', e => {
+      if (!menu.hidden && !e.target.closest('.brand-wrap')) toggle(false);
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !menu.hidden) toggle(false);
+    });
+  }
+
   function bindEvents() {
     bindSearchSuggest();
+    bindBrandMenu();
     document.getElementById('open-flashcards').addEventListener('click', openFlashcards);
     document.getElementById('close-flashcards').addEventListener('click', closeFlashcards);
     document.getElementById('flashcard').addEventListener('click', flipCard);
