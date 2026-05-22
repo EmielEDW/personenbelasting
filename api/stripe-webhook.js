@@ -25,6 +25,12 @@ const KV_URL = process.env.KV_REST_API_URL;
 const KV_TOKEN = process.env.KV_REST_API_TOKEN;
 const POOL_KEY = process.env.PB_UNUSED_CODES_KEY || 'pb-unused-codes';
 
+// Comma-separated list of Stripe payment_link IDs (plink_xxx) that belong
+// to this site. If empty, NO filter is applied (legacy behaviour).
+// Add more IDs when you create a test payment link, etc.
+const PB_PAYMENT_LINK_IDS = (process.env.PB_PAYMENT_LINK_IDS || '')
+  .split(',').map(s => s.trim()).filter(Boolean);
+
 function readRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -143,6 +149,16 @@ module.exports = async (req, res) => {
 
   const session = event.data && event.data.object;
   if (!session) return res.status(400).json({ error: 'Missing session object' });
+
+  // Stripe stuurt elk event naar ELK geregistreerd webhook endpoint, dus we
+  // moeten zelf filteren of dit een PB-betaling is. Filter op payment_link ID.
+  if (PB_PAYMENT_LINK_IDS.length > 0) {
+    const linkId = session.payment_link;
+    if (!linkId || !PB_PAYMENT_LINK_IDS.includes(linkId)) {
+      console.log(`Ignoring session (payment_link=${linkId || 'none'}, not in PB allowlist)`);
+      return res.status(200).json({ ok: true, ignored: 'not-pb' });
+    }
+  }
 
   const customerEmail = session.customer_email || (session.customer_details && session.customer_details.email);
   const customerName = session.customer_details && session.customer_details.name;
