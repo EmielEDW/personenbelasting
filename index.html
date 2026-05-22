@@ -803,35 +803,46 @@
 
   /* ===== MOBILE (<= 720px) — explicit polish ===== */
   @media (max-width: 720px) {
-    /* Top bar — make it readable + scrollable horizontally with snap, buttons big-thumb */
+    /* Top bar — brand + pack-status on row 1, search on row 2, buttons in 2x2 grid on row 3 */
     .top-bar-inner {
       padding: 10px 12px;
       gap: 8px;
-      flex-wrap: nowrap;       /* keep single row at top */
+      flex-wrap: wrap;
     }
-    .brand { font-size: 17px; min-width: 0; flex: 0 1 auto; }
-    .brand .sub { display: none; }  /* hide subtitle on mobile to save space */
+    .brand { font-size: 17px; min-width: 0; flex: 1 1 auto; }
+    .brand .sub { display: none; }
     .top-actions {
       order: 4;
       flex: 1 1 100%;
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1fr;   /* 2 columns, 2 rows = all 4 buttons visible */
       gap: 8px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      padding-bottom: 2px;
-      flex-wrap: nowrap;
+      overflow: visible;
     }
-    .top-actions::-webkit-scrollbar { display: none; }
     .top-actions .btn {
-      padding: 11px 16px;
+      padding: 12px 14px;
       font-size: 14px;
-      flex-shrink: 0;
-      min-height: 42px;     /* big touch target */
+      min-height: 44px;
       font-weight: 500;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    [data-pack-status] { flex-shrink: 0; }
-    [data-pack-status] .pack-badge { padding: 8px 14px; font-size: 12.5px; }
+    /* pack-status sits next to the brand on row 1, not in the button grid */
+    [data-pack-status] {
+      flex-shrink: 0;
+      order: 2;
+    }
+    [data-pack-status] .pack-badge { padding: 8px 12px; font-size: 12px; }
+    /* The pack-status span is rendered inside .top-actions in HTML. Pull it out of the grid by spanning full width and ordering it before buttons */
+    .top-actions [data-pack-status],
+    .top-actions > span[data-pack-status] {
+      grid-column: 1 / -1;
+      order: -1;
+      display: flex;
+      justify-content: center;
+    }
 
     .search-wrap { order: 3; max-width: none; flex: 1 1 100%; }
     .search-wrap input { padding: 12px 16px 12px 38px; font-size: 16px; /* iOS zoom guard */ }
@@ -929,10 +940,30 @@
     .calc-body { padding: 16px 14px 60px; }
     .calc-card { padding: 16px; gap: 14px; grid-template-columns: 1fr; }
     .calc-field input, .calc-field select { font-size: 16px; padding: 10px 12px; }
-    .calc-out { padding: 14px 16px; }
-    .calc-out-line { font-size: 12px; }
-    .calc-out-line .val { font-size: 14px; }
-    .calc-out-line.result .val { font-size: 20px; }
+    .calc-out { padding: 14px 16px; gap: 10px; }
+    .calc-out-line {
+      /* stack lbl above val on mobile so long labels can't push values off the line */
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px;
+      font-size: 12.5px;
+      padding-bottom: 8px;
+    }
+    .calc-out-line .lbl {
+      white-space: normal;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    .calc-out-line .val {
+      margin-left: 0;
+      font-size: 16px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .calc-out-line.result { margin: 6px 0 0; padding: 12px 12px 14px; }
+    .calc-out-line.result .val { font-size: 22px; }
+    .calc-formule { font-size: 12px; padding: 12px 14px; }
+    .calc-formule code { word-break: break-word; }
     .calc-disclaimer { font-size: 12.5px; padding: 12px 14px; }
 
     /* Promo & chapters paywall */
