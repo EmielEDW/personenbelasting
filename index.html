@@ -9,30 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked@13.0.2/marked.min.js"></script>
 
-<!-- ===== Vercel Web Analytics (privacy-first, no cookies) ===== -->
-<!-- Activeer in Vercel dashboard: project → Analytics → Enable -->
+<!-- ===== Vercel Web Analytics (privacy-first, no cookies) =====
+     Vercel injecteert /_vercel/insights/script.js automatisch zodra Web Analytics
+     ENABLED is in het project (Analytics tab → Enable). Tot dan is dit 404 → no-op. -->
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 
-<!-- ===== Hotjar (heatmaps + session recordings) =====
-     Sign up at hotjar.com → kopieer je Site ID en plak hieronder.
-     Laat HOTJAR_SITE_ID op 0 zodat het script niets uitvoert tot je hem invult. -->
-<script>
-  (function() {
-    const HOTJAR_SITE_ID = 0; // ← vervang door je echte Hotjar ID (bv. 3812345)
-    if (!HOTJAR_SITE_ID) return;
-    (function(h,o,t,j,a,r){
-      h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-      h._hjSettings={hjid:HOTJAR_SITE_ID,hjsv:6};
-      a=o.getElementsByTagName('head')[0];
-      r=o.createElement('script');r.async=1;
-      r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-      a.appendChild(r);
-    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-  })();
-</script>
+<!-- ===== Hotjar (Contentsquare) — heatmaps + session recordings ===== -->
+<script src="https://t.contentsquare.net/uxa/308de3d9ebf5e.js"></script>
 
 <script src="auth.js"></script>
 <style>
